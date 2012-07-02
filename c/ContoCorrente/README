@@ -1,0 +1,8 @@
+Conto Corrente
+
+Programma didattico che illustra come sia possibile, tramite utilizzo di puntatori a funzionne annidati in strutture, utilizzare il linguaggio C in modo OOP. 
+Questo programma e' stato da me implementato per le lezioni di Programmazione ad Oggetti dell'Universita' di Modena e Reggio Emilia.
+
+
+Esempio di compilazione:
+$ gcc -o main.exe main.c CC_pub.h CC_private.c
