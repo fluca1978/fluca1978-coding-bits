@@ -1,0 +1,24 @@
+Esercizio: Semplice tool visuale per la gestione di note di testo
+
+Si vuole sviluppare una semplice applicazione per la creazione,
+aggiornamento, visualizzazione ed il salvataggio di note di testo. 
+
+Il frame principale dell'applicazione è provisto di un menù per la
+creazione di nuove note e la selezione di quelle già create.
+L'interfaccia deve visualizzare la nota corrente e consentire
+di aggiornarla aggiungendo nuove righe di testo; le note possono
+essere visualizzate come finestre indipendenti e marcate come
+invalide per non essere più modificabili.
+
+In particolare devono essere disponibili i seguenti comandi (bottoni):
+- Aggiungi testo alla nota: aggiorna la nota inserendo in coda il 
+testo specificato
+- Cambia la nota: sostituisce il testo della nota corrente con quello
+specificato
+- Pulisci: azzera la visualizzazione delle note, chiudendo quella
+corrente
+- Invalida la nota: marca la nota come invalida
+- Salva: salva su file la nota corrente, rendendola persistente anche
+ad un successivo avvio del programma
+- Post-it/Rimuovi post-it: visualizza/rimuove una nuova finestra con
+il contenuto della nota corrente
