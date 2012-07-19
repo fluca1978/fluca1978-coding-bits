@@ -31,9 +31,20 @@ for ((i=0 ; i < 10 ; i++)); do
     # store the error also in an array place
     error_array[$i]=$current_error
 
-    # print the errors
-    echo "The current error variable contains  [$current_error]"
+
+
+    # do some testing on the errors
+    if [ ! -z "$current_error" ]
+    then
+	echo "Current error variable is not empty!"
+	    # print the errors
+	echo "The current error variable contains  [$current_error]"
+
+    fi
+
     echo "The array cell $i contains the value " ${error_array[i]}
+
+
 done
 
 
