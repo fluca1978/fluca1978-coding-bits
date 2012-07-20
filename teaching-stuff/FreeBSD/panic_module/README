@@ -1,0 +1,21 @@
+This module is a didactic one that modifies the mkdir and open syscalls injecting
+a panicable version. The new installed version, when invoked with a particular path
+(and mode) will generate a panic.
+
+- panicModule.h
+Declares the module initialization structure, that is used to handle
+the data that the module will use to check if the syscall have to generate
+a panic.
+
+- panicModule.c
+module handler implementation. The main module handler installs and removes the
+panicable syscalls so that when the user decides to crash the system
+can exploit the modified syscalls.
+
+- panicModuleSyscalls.h
+Declaration of the syscalls and their arguments that will be used by this module.
+
+- panicModuleSyscalls.c
+Definition of the panicable system calls. Each system call, when called, could produce
+a panic on the system if the path (and mode) match those of a module initialization
+list.
