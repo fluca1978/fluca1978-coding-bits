@@ -1,5 +1,5 @@
-#ifndef _PANIC_MODULE_H_
-#defin  _PANIC_MODULE_H_ 
+#ifndef  _PANIC_MODULE_H_
+#define  _PANIC_MODULE_H_ 
 
 
 /**

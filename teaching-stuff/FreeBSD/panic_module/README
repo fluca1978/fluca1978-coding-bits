@@ -1,6 +1,8 @@
 This module is a didactic one that modifies the mkdir and open syscalls injecting
 a panicable version. The new installed version, when invoked with a particular path
 (and mode) will generate a panic.
+The module has been tested and developed on a FreeBSD 8.2-RELEASE system (i386) running
+on a virtual box machine.
 
 - panicModule.h
 Declares the module initialization structure, that is used to handle

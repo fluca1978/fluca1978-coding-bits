@@ -54,6 +54,79 @@ static panic_module_argv_t _argv = {
 panic_module_argv_t* moduleInitializationData = NULL;
 
 
+
+
+/**
+ * Define the panicable mkdir system call.
+ * The struct contains the number of arguments used for the system call
+ * (i.e., size of arguments over the size of the registers = number
+ * of the registers) as well as the method to call to execute the 
+ * system call. The structure contains also some other initialization stuff
+ * that is copied by sys/init_sysent.c
+ */
+static struct sysent panicable_mkdir_sysent_definition = {
+  (sizeof(struct mkdir_args) / sizeof(register_t)), /* same AS(name) from init_sysent.c */
+  (sy_call_t *) panicable_mkdir,
+  AUE_MKDIR, 
+  NULL, 
+  0, 
+  0, 
+  0
+};
+
+/**
+ * A struct used to keep the data of the original mkdir system call,
+ * so that is is possible to switch back to the original system call
+ * once the module is unloaded.
+ */
+static struct sysent clean_mkdir_sysent_definition = {
+  (sizeof(struct mkdir_args) / sizeof(register_t)), /* same AS(name) from init_sysent.c */
+  NULL,
+  AUE_MKDIR, 
+  NULL, 
+  0, 
+  0, 
+  0
+};
+
+
+
+
+/**
+ * Define the panicable open system call.
+ * The struct contains the number of arguments used for the system call
+ * (i.e., size of arguments over the size of the registers = number
+ * of the registers) as well as the method to call to execute the 
+ * system call. The structure contains also some other initialization stuff
+ * that is copied by sys/init_sysent.c
+ */
+struct sysent panicable_open_sysent_definition = {
+  (sizeof(struct open_args) / sizeof(register_t)), /* same AS(name) from init_sysent.c */
+  (sy_call_t *) panicable_open,
+  AUE_OPEN_RWTC, 
+  NULL, 
+  0, 
+  0, 
+  0
+};
+
+/**
+ * A struct used to keep the data of the original open system call,
+ * so that is is possible to switch back to the original system call
+ * once the module is unloaded.
+ */
+struct sysent clean_open_sysent_definition = {
+  (sizeof(struct open_args) / sizeof(register_t)), /* same AS(name) from init_sysent.c */
+  NULL,
+  AUE_OPEN_RWTC, 
+  NULL, 
+  0, 
+  0, 
+  0
+};
+
+
+
 /*---------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------*/

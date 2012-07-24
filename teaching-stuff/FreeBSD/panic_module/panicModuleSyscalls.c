@@ -22,6 +22,19 @@ int panicable_mkdir( struct thread *thread,
   /* a flag to indicate if should generate a panic or not */
   int shouldPanic = 0;
 
+#ifdef _LOCAL_PATH_
+
+  char localPath[ 255 ];
+
+  /* zero fill the memory */
+  for( int i = 0; i < 255; i++ )
+    localPath[ i ] = '\0';
+
+  /* copy the mkdir path to a local variable, so it will be available
+     when using the debugger */
+  strcpy( localPath, uap->path );
+#endif /* _LOCAL_PATH */
+
   /* check if the path for the mkdir call
      is contained into one of the panic paths defined
      at the time of module load */
@@ -65,6 +78,19 @@ int panicable_open(  struct thread    *thread,
 {
   /* a flag to indicate if should generate a panic or not */
   int shouldPanic = 0;
+
+#ifdef _LOCAL_PATH_
+
+  char localPath[ 255 ];
+
+  /* zero fill the memory */
+  for( int i = 0; i < 255; i++ )
+    localPath[ i ] = '\0';
+
+  /* copy the mkdir path to a local variable, so it will be available
+     when using the debugger */
+  strcpy( localPath, uap->path );
+#endif /* _LOCAL_PATH */
 
   
 
