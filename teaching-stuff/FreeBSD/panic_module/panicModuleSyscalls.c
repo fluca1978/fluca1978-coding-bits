@@ -1,6 +1,11 @@
 #include <panicModuleSyscalls.h>    /* syscall declaration and arguments */
 #include <panicModule.h>            /* initialization module variable */
 
+#ifdef _MALLOC_ARGS_
+#include <sys/param.h>
+#include <sys/malloc.h>
+#include <sys/kernel.h>
+#endif //_MALLOC_ARGS_
 
 /**
  * The module will use a global variable to handle the initialization
@@ -16,6 +21,14 @@ extern panic_module_argv_t* moduleInitializationData;
 
 
 
+#ifdef _MALLOC_ARGS_
+
+static MALLOC_DEFINE( M_PANIC_MEMORY, "mkdir-path", "Argument to the mkdir system call" );
+#endif //_MALLOC_ARGS_
+
+
+
+
 
 int panicable_mkdir( struct thread *thread,
 		     struct mkdir_args *uap 
@@ -27,6 +40,7 @@ int panicable_mkdir( struct thread *thread,
 #ifdef _LOCAL_PATH_
 
   char localPath[ 255 ];
+  char *localPathPointer;
 
   /* zero fill the memory */
   for( int i = 0; i < 255; i++ )
@@ -35,7 +49,22 @@ int panicable_mkdir( struct thread *thread,
   /* copy the mkdir path to a local variable, so it will be available
      when using the debugger */
   strcpy( localPath, uap->path );
+
+  /* copy also the pointer, to see the difference in the debugger */
+  localPathPointer = uap->path;
+
 #endif /* _LOCAL_PATH */
+
+
+#ifdef _MALLOC_ARGS_
+  char *kPath = malloc( strlen( uap->path ) + 1 , M_PANIC_MEMORY, M_NOWAIT );
+  
+
+  // copy the uap into the kernel version
+  copyinstr( uap->path, kPath, strlen( uap->path ), NULL );
+#endif //_MALLOC_ARGS_
+
+
 
   /* check if the path for the mkdir call
      is contained into one of the panic paths defined
