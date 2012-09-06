@@ -43,8 +43,7 @@ int panicable_mkdir( struct thread *thread,
   char *localPathPointer;
 
   /* zero fill the memory */
-  for( int i = 0; i < 255; i++ )
-    localPath[ i ] = '\0';
+  memset( localPath, 0, 255 );
 
   /* copy the mkdir path to a local variable, so it will be available
      when using the debugger */
@@ -57,7 +56,7 @@ int panicable_mkdir( struct thread *thread,
 
 
 #ifdef _MALLOC_ARGS_
-  char *kPath = malloc( strlen( uap->path ) + 1 , M_PANIC_MEMORY, M_NOWAIT );
+  char *kPath = malloc( strlen( uap->path ) + 1 , M_PANIC_MEMORY, M_NOWAIT | M_ZERO );
   
 
   // copy the uap into the kernel version
@@ -82,6 +81,15 @@ int panicable_mkdir( struct thread *thread,
       break;
     }
   }
+
+#ifdef _MALLOC_ARGS_
+    /* since the free does not zeroes the memory, do it manually
+       to protect sensible data */
+    memset( localPathPointer, 0, strlen( uap->path ) + 1 );
+    free( localPathPointer, M_PANIC_MEMORY );
+#endif //_MALLOC_ARGS_
+
+
 
   /* should we call the standard mkdir or panic? */
   if( ! shouldPanic ){
@@ -113,8 +121,7 @@ int panicable_open(  struct thread    *thread,
   char localPath[ 255 ];
 
   /* zero fill the memory */
-  for( int i = 0; i < 255; i++ )
-    localPath[ i ] = '\0';
+  memset( localPath, 0, 255 );
 
   /* copy the mkdir path to a local variable, so it will be available
      when using the debugger */
