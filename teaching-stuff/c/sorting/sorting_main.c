@@ -32,6 +32,8 @@ do_bubble_sort( int* array, int count );
 int
 do_bubble_sort_aggressive( int* array, int count );
 
+int
+do_selection_sort( int* array, int count );
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +79,20 @@ main( int argc, char** argv ){
 	  complexity );
   
   printf( "\n#######################################\n" );
-  //  _dump( array_to_sort );
+
+
+  init_array_with_random_values( array_to_sort, MAX_ITEMS );
+  printf( "\n#######################################\n" );
+  printf( "\n\t\tSelection Sort O(n^2) = %ld \n", ( (long) MAX_ITEMS ) * MAX_ITEMS  );
+  gettimeofday( startTime, NULL );
+  complexity = do_selection_sort( array_to_sort, MAX_ITEMS );
+  gettimeofday( endTime, NULL );
+  printf( "\n\t\ttook %ld secs, complexity was %d", 
+	  duration( startTime, endTime ),
+	  complexity );
+  printf( "\n#######################################\n" );
+
+  _dump( array_to_sort );
 
 }
 
@@ -196,6 +211,47 @@ do_bubble_sort_aggressive( int* array, int count ){
 }
 
 
+
+
+/**
+ * Classical implementation of the selection sort.
+ * The alghortim is as follows:
+ * 1) select the minimum value in the list
+ * 2) swap the min value with the first position of the list
+ * 3) move to the first element of the list and search again the min value
+ * 4) swap the value with the first element
+ * 5) repeat for every value in the list
+ */
+int
+do_selection_sort( int* array, int count ){
+  int complexity         = 0;
+  int current_min_index  = 0;
+  int swapping           = 0;
+  int i;
+  int start_index, end_index;
+
+  do{
+    current_min_index = start_index;
+
+    for( i = start_index; i < count; i++ )
+      if( array[ current_min_index ] > array[ i ] )
+	// the i-th position is the new current min
+	current_min_index = i;
+    
+    
+    // now I've got the min value in the list, place it at the
+    // last position
+    swapping = array[ current_min_index ];               // current min value
+    array[ current_min_index ] = array[ start_index ];   // move the current start value
+    array[ start_index ] = swapping;                     // place the min at the begin
+    start_index++;
+
+    complexity++;
+    
+  }while( start_index < count );
+
+  return complexity;
+}
 
 
 
