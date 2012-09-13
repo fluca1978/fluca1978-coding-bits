@@ -11,7 +11,10 @@
 // include che definisce la versione pubblica
 // della struttura ContoCorrente
 #include "CC_pub.h"		
-						
+
+// conto corrente con carta di credito
+// si prende solo la parte pubblica
+#include "CCX_pub.h"
 
 
 int main(void){
@@ -23,8 +26,8 @@ int main(void){
 	printf("\nProgramma in esecuzione\n");
 
 	// creo i conti corrente
-	C1 = aperturaContoCorrente( 3663 );
-	C2 = aperturaContoCorrente( 8026 );
+	C1 = aperturaContoCorrente( 3663, "Luca Ferrari" );
+	C2 = aperturaContoCorrente( 8026, "Poor Man" );
 
 
 	// effettuo dei versamenti
@@ -54,8 +57,20 @@ int main(void){
 	dichiarato in un altro file e non "importato" esplicitamente. */
 
 
-	// fine del programma
-	getchar();		// aspetto che l'utente prema un tasto per terminare
+
+	//------------- GESTIONE CARTA DI CREDITO ----------------------------
+
+
+	printf( "\nCostruzione di un conto con carta di credito\n");
+	ContoCorrenteConCartaPub *ccCarta = abilitaCarta( C1, "123456789" );
+
+	ContoCorrentePub* ccpub = ccCarta->contoCorrente;
+	printf( "\nCarta di credito per il conto %s = %s\n",
+		ccCarta->contoCorrente->m_titolare( ccCarta->contoCorrente ),
+		ccCarta->m_numero_carta( ccCarta ) );
+	
+
+
 }
 
 
@@ -63,12 +78,13 @@ int main(void){
 
 /************  OUTPUT DI ESECUZIONE *********************/
 /*
-
 Programma in esecuzione
 
 	[aperturaContoCorrente] inizializzazione dati conto corrente
+	[aperturaContoCorrente] Titolare Luca Ferrari numero conto 3663
 	[Private2Pub] conversione della struttura da private a pub
 	[aperturaContoCorrente] inizializzazione dati conto corrente
+	[aperturaContoCorrente] Titolare Poor Man numero conto 8026
 	[Private2Pub] conversione della struttura da private a pub
 	[Public2Private] conversione della struttura da pub a private
 	[Public2Private] conversione della struttura da pub a private
@@ -76,12 +92,14 @@ Programma in esecuzione
 	[Public2Private] conversione della struttura da pub a private
 	[Public2Private] conversione della struttura da pub a private
 ----------- INFORMAZIONI SUL CONTO CORRENTE ---------
+Titolare Luca Ferrari
 Numero di conto: 3663
 Saldo corrente: 12000
 Numero di movimenti registrati: 2
 -----------------------------------------------------
 	[Public2Private] conversione della struttura da pub a private
 ----------- INFORMAZIONI SUL CONTO CORRENTE ---------
+Titolare Poor Man
 Numero di conto: 8026
 Saldo corrente: 5000
 Numero di movimenti registrati: 2
@@ -92,6 +110,21 @@ Movimento 1, valore 2000
 	[Public2Private] conversione della struttura da pub a private
 Movimento 0, valore 7000
 Movimento 1, valore -2000
+Costruzione di un conto con carta di credito
+
+	[Public2Private] conversione della struttura da pub a private
+	[abilitaCarta] Abilitazione carta 123456789 su conto Luca Ferrari
+	[Public2Private] conversione della struttura da pub a private
+	[Public2Private] conversione della struttura da pub a private
+	[aperturaContoCorrente] inizializzazione dati conto corrente
+	[aperturaContoCorrente] Titolare Luca Ferrari numero conto 3663
+	[Private2Pub] conversione della struttura da private a pub
+	[CCX Private2Public] conversione della struttura da private a pub
+
+	[CCX Public2Private] conversione della struttura da pub a private
+
+	[Public2Private] conversione della struttura da pub a private
+Carta di credito per il conto Luca Ferrari = 123456789
 
 */
 

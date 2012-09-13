@@ -75,6 +75,7 @@ typedef struct{
 	int Saldo;				// saldo attuale
 	int Movimenti[MAX_MOVIMENTI];		// lista degli ultimi movimenti
 	int cur_mov;				// indice del movimento corrente
+	char* titolare;                         // titolare del conto
 } ContoCorrentePrivate;
 
 
@@ -142,6 +143,34 @@ static void registraMovimento(ContoCorrentePrivate* ccpriv, int ammontare){
 
 
 
+char* getTitolare( ContoCorrentePub* ccpub ){
+	ContoCorrentePrivate* ccpriv = NULL;
+
+	// verifico se il puntatore passato è valido
+	if( ccpub == NULL ){
+		return;
+	}
+
+	// conversione a struttura privata
+	ccpriv = Public2Private( ccpub );
+
+	return ccpriv->titolare;
+}
+
+
+int getNumeroConto( ContoCorrentePub* ccpub ){
+	ContoCorrentePrivate* ccpriv = NULL;
+
+	// verifico se il puntatore passato è valido
+	if( ccpub == NULL ){
+		return;
+	}
+
+	// conversione a struttura privata
+	ccpriv = Public2Private( ccpub );
+
+	return ccpriv->NumeroConto;
+}
 
 
 /* 
@@ -163,6 +192,7 @@ void StampaContoCorrente(ContoCorrentePub* ccpub){
 
 	// stampa dei campi
 	printf("\n----------- INFORMAZIONI SUL CONTO CORRENTE ---------");
+	printf("\nTitolare %s", ccpriv->titolare );
 	printf("\nNumero di conto: %d", ccpriv->NumeroConto);
 	printf("\nSaldo corrente: %d",  ccpriv->Saldo);
 	printf("\nNumero di movimenti registrati: %d", ccpriv->cur_mov);
@@ -276,7 +306,7 @@ void stampaMovimenti(ContoCorrentePub* ccpub){
  * una struttura dati privata (ContoCorrentePrivate), per poi restituire il
  * puntatore alla struttura pubblica (ContoCorrentePub). 
  */
-ContoCorrentePub* aperturaContoCorrente(int numero_conto){
+ContoCorrentePub* aperturaContoCorrente(int numero_conto, char* titolare){
 
 	ContoCorrentePrivate* ccpriv = NULL;
 
@@ -290,6 +320,9 @@ ContoCorrentePub* aperturaContoCorrente(int numero_conto){
 		ccpriv->NumeroConto = numero_conto;
 		ccpriv->Saldo       = 0;
 		ccpriv->cur_mov     = 0;
+		ccpriv->titolare    = titolare;
+
+		printf("\n\t[aperturaContoCorrente] Titolare %s numero conto %d",  ccpriv->titolare, ccpriv->NumeroConto );
 
 		// "aggancio" i puntatori alle relative funzioni
 		ccpriv->pub.saldo              = getSaldo;
@@ -297,6 +330,8 @@ ContoCorrentePub* aperturaContoCorrente(int numero_conto){
 		ccpriv->pub.m_versamento       = versamento;
 		ccpriv->pub.m_prelievo         = prelievo;
 		ccpriv->pub.m_stampa_movimenti = stampaMovimenti;
+		ccpriv->pub.m_titolare         = getTitolare;
+		ccpriv->pub.m_numero_conto     = getNumeroConto;
 
 	}
 

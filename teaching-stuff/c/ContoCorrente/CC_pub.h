@@ -1,6 +1,14 @@
 /* CC_pub.h */
 
+#ifndef __CC_INCLUDE_GUARD__
+#define __CC_INCLUDE_GUARD__ "CC_pub.h"
+
+
+
 // author: Luca Ferrari fluca1978 at gmail.com 
+
+
+
 
 /* 
  * Questo file header definisce la struttura pubblica del ContoCorrente.
@@ -20,23 +28,34 @@
 
 
 typedef struct CCPUB{
-	// puntatore alla funzione getSaldo
-	int (*saldo)(struct CCPUB*);    
-	
-	// puntatore alla funzione StampaContoCorrente
-	void (*m_stampa)(struct CCPUB*);
+  // puntatore alla funzione getSaldo
+  int (*saldo)(struct CCPUB*);    
+  
+  // puntatore alla funzione StampaContoCorrente
+  void (*m_stampa)(struct CCPUB*);
+  
+  // puntatore alla funzione versamento
+  int (*m_versamento)(struct CCPUB*, int);
+  
+  // puntatore alla funzione prelievo
+  int (*m_prelievo)(struct CCPUB*, int);
+  
+  // puntatore alla funzione stampaMovimenti
+  void (*m_stampa_movimenti)(struct CCPUB*);
+  
+  // metodo per ottenere il titolare del conto
+  char* (*m_titolare)( struct CCPUB* );
 
-	// puntatore alla funzione versamento
-	int (*m_versamento)(struct CCPUB*, int);
+  // metodo per ottenere il numero del conto
+  int (*m_numero_conto)( struct CCPUB* );
 
-	// puntatore alla funzione prelievo
-	int (*m_prelievo)(struct CCPUB*, int);
-
-	// puntatore alla funzione stampaMovimenti
-	void (*m_stampa_movimenti)(struct CCPUB*);
 } ContoCorrentePub;
 
 
 
 /* servizi pubblici disponibili per questo modulo */
-ContoCorrentePub* aperturaContoCorrente( int numero_conto );
+ContoCorrentePub* aperturaContoCorrente( int numero_conto, char* titolare );
+
+
+
+#endif
