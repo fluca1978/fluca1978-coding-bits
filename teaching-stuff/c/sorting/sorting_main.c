@@ -35,6 +35,9 @@ do_bubble_sort_aggressive( int* array, int count );
 int
 do_selection_sort( int* array, int count );
 
+int
+do_quick_sort( int* array, int start, int end );
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -91,6 +94,20 @@ main( int argc, char** argv ){
 	  duration( startTime, endTime ),
 	  complexity );
   printf( "\n#######################################\n" );
+
+
+  init_array_with_random_values( array_to_sort, MAX_ITEMS );
+  printf( "\n#######################################\n" );
+  printf( "\n\t\tQuick Sort  O( n log n) up to O(n^2) = %ld \n", ( (long) MAX_ITEMS ) * MAX_ITEMS  );
+  gettimeofday( startTime, NULL );
+  complexity = do_quick_sort( array_to_sort, 0, MAX_ITEMS );
+  gettimeofday( endTime, NULL );
+  printf( "\n\t\ttook %ld secs, complexity was %d", 
+	  duration( startTime, endTime ),
+	  complexity );
+  printf( "\n#######################################\n" );
+
+
 
   _dump( array_to_sort );
 
@@ -255,6 +272,54 @@ do_selection_sort( int* array, int count ){
 
 
 
+int
+do_quick_sort( int* array, int start, int end ){
+  int complexity   = 0;
+  int pivot_value  = 0;
+  int pivot_index  = 0;
+  int i;
+  int swapping;
+
+  int partition_start = start;
+  int partition_end   = end;
+
+  // pick a pivot (get an index in the middle of the partition)
+  pivot_index = ( partition_end - partition_start ) / 2 + partition_start;
+  pivot_value = array[ pivot_index ];
+
+  // do the partitioning
+  while( partition_start <= partition_end ){
+
+    while( array[ partition_start ] < pivot_value )
+      partition_start++;
+
+    while( array[ partition_end ] > pivot_value )
+      partition_end--;
+
+    if( partition_start <= partition_end ){
+      swapping                 = array[ partition_start ];
+      array[ partition_start ] = array[ partition_end ];
+      array[ partition_end ]   = swapping;
+      partition_start++;
+      partition_end--;
+
+      complexity++;
+    }
+  }
+
+  // recursion
+  if( start < partition_end )
+    complexity += do_quick_sort( array, start, partition_end );
+  if( end > partition_start )
+    complexity += do_quick_sort( array, partition_start, end );
+    
+  return complexity;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 
 void _dump( int * array){
   int i = 0;
