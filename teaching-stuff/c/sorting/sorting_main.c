@@ -60,6 +60,9 @@ The program is configured for sorting max 10000 random values
 
 #define MICROSECS_PER_SECOND 1000000
 
+/*
+ * Alghoritm selectors
+ */
 #define BUBBLE_SORT            1
 #define BUBBLE_SORT_AGGRESSIVE 2
 #define MERGE_SORT             3
@@ -127,20 +130,45 @@ main( int argc, char** argv ){
   bzero( array_to_sort, sizeof( int ) * number_of_elements );
 
 
+  // init the array
+  init_array_with_random_values( array_to_sort, number_of_elements );
 
+
+
+  run_sort( BUBBLE_SORT, array_to_sort, 0, number_of_elements );
+  run_sort( BUBBLE_SORT_AGGRESSIVE, array_to_sort, 0, number_of_elements );
+  run_sort( SELECTION_SORT, array_to_sort, 0, number_of_elements );
+  run_sort( QUICK_SORT, array_to_sort, 0, number_of_elements );
   run_sort( MERGE_SORT, array_to_sort, 0, number_of_elements );
 
+  free( array_to_sort );
 
 }
 
-
-void run_sort( int whichAlghoritm, int* array_to_sort, int start, int end ){
+/**
+ * Main entry poinf for calling a specific sorting alghoritm.
+ * The function does a copy of the initial data set, so that it is left unchanged,
+ * and then calls the right alghoritm printing also a report about the execution
+ * time and so on.
+ *
+ * \param whichAlghoritm an identifier for the alghoritm to iovoke
+ * \param array_to_sort_src the source array to sort, it will be cloned and therefore
+ * will be unchanged
+ * \param start initial index in the array, usually 0
+ * \param end the last entry in the array
+ */
+void 
+run_sort( int whichAlghoritm, int* array_to_sort_src, int start, int end ){
 
   // pointer to the sorter engine
   long (*sorter)(int*, int, int);
   char *title  = NULL;
   int number_of_elements = end - start;
   long complexity         = 0;
+  int  *array_to_sort = (int*) malloc( sizeof( int ) * number_of_elements );
+  // clone the array to sort so that the initial array is untouched
+  memcpy( array_to_sort, array_to_sort_src, sizeof( int ) * number_of_elements );
+
   // variables to handle timing of the sorting alghoritms
   struct timeval *startTime, *endTime;
   // allocate time structures
@@ -177,10 +205,9 @@ void run_sort( int whichAlghoritm, int* array_to_sort, int start, int end ){
 
 
   printf( "\n#######################################\n" );
-  printf( "\n\t\t" );
-  printf( title );
+  printf( "\n\t\t%s,\n", title );
 	  
-  init_array_with_random_values( array_to_sort, number_of_elements );
+  
 #ifdef SORT_VERBOSE
   printf( "\n Initial array is\n" );
   _dump( array_to_sort, number_of_elements );
@@ -189,8 +216,7 @@ void run_sort( int whichAlghoritm, int* array_to_sort, int start, int end ){
   gettimeofday( startTime, NULL );
   complexity = sorter( array_to_sort, start, number_of_elements );
   gettimeofday( endTime, NULL );
-  printf( "\n\n\t\t" );
-  printf( title );
+  printf( "\n\n\t\t%s\n", title );
   printf( " %2.2f secs, complexity was %ld", 
 	  duration( startTime, endTime ),
 	  complexity );
@@ -205,6 +231,8 @@ void run_sort( int whichAlghoritm, int* array_to_sort, int start, int end ){
   free( startTime );
   free( endTime );
   */
+
+  free( array_to_sort );
 }
 
 
@@ -443,7 +471,7 @@ long
 do_merge_sort( int* array, int start, int end ){
 
   int partitionIndex = ( end + start ) / 2;
-  long complexity    = 0;
+  long complexity    = -1;
   
   if( start < end ){
 #ifdef SORT_VERBOSE
@@ -477,8 +505,10 @@ do_merge( int* array, int start, int partitionIndex, int end ){
   while( leftIndex <= partitionIndex && rightIndex <= end )
     if( array[ leftIndex ] < array[ rightIndex ] )
       copyArray[ copyIndex++ ] = array[ leftIndex++ ];
+
     else
       copyArray[ copyIndex++ ] = array[ rightIndex++ ];
+
 
   while( leftIndex <= partitionIndex )
     copyArray[ copyIndex++ ] = array[ leftIndex++ ];
