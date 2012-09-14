@@ -63,12 +63,14 @@ The program is configured for sorting max 10000 random values
 /*
  * Alghoritm selectors
  */
-#define BUBBLE_SORT            1
-#define BUBBLE_SORT_AGGRESSIVE 2
-#define MERGE_SORT             3
-#define QUICK_SORT             4
-#define SELECTION_SORT         5
 
+typedef enum {
+  BUBBLE_SORT = 0,               /* DO NOT MOVE! */
+  BUBBLE_SORT_AGGRESSIVE,
+  MERGE_SORT,
+  QUICK_SORT,
+  SELECTION_SORT                 /* DO NOT MOVE! */
+} SORT_ENGINE;
 
 
 double
@@ -107,7 +109,7 @@ int
 main( int argc, char** argv ){
   
   long number_of_elements = 0;
-
+  int current_sort_engine = -1;
 
   printf( "\nWelcome to the sorting sample!\n" );
   printf( "\nThe program is configured for sorting max %ld random values\n", (long) MAX_ITEMS );
@@ -133,13 +135,11 @@ main( int argc, char** argv ){
   // init the array
   init_array_with_random_values( array_to_sort, number_of_elements );
 
+  // loop on each sort engine
+  for( current_sort_engine = BUBBLE_SORT; current_sort_engine <= SELECTION_SORT; current_sort_engine++ )
+    run_sort( current_sort_engine, array_to_sort, 0, number_of_elements );
 
 
-  run_sort( BUBBLE_SORT, array_to_sort, 0, number_of_elements );
-  run_sort( BUBBLE_SORT_AGGRESSIVE, array_to_sort, 0, number_of_elements );
-  run_sort( SELECTION_SORT, array_to_sort, 0, number_of_elements );
-  run_sort( QUICK_SORT, array_to_sort, 0, number_of_elements );
-  run_sort( MERGE_SORT, array_to_sort, 0, number_of_elements );
 
   free( array_to_sort );
 
@@ -204,8 +204,8 @@ run_sort( int whichAlghoritm, int* array_to_sort_src, int start, int end ){
   }
 
 
-  printf( "\n#######################################\n" );
-  printf( "\n\t\t%s,\n", title );
+  printf( "\n\t#######################################\n" );
+  printf( "\n\t\tDoing a %s", title );
 	  
   
 #ifdef SORT_VERBOSE
@@ -216,8 +216,8 @@ run_sort( int whichAlghoritm, int* array_to_sort_src, int start, int end ){
   gettimeofday( startTime, NULL );
   complexity = sorter( array_to_sort, start, number_of_elements );
   gettimeofday( endTime, NULL );
-  printf( "\n\n\t\t%s\n", title );
-  printf( " %2.2f secs, complexity was %ld", 
+  printf( "\n\t\t%s\n", title );
+  printf( "\t\t %2.2f secs, complexity was %ld", 
 	  duration( startTime, endTime ),
 	  complexity );
 #ifdef SORT_VERBOSE
@@ -225,7 +225,7 @@ run_sort( int whichAlghoritm, int* array_to_sort_src, int start, int end ){
   _dump( array_to_sort, number_of_elements );
 #endif //SORT_VERBOSE
 
-  printf( "\n#######################################\n" );
+  printf( "\n\t#######################################\n" );
 
   /*  
   free( startTime );
