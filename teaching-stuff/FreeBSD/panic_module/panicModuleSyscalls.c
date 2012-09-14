@@ -1,6 +1,11 @@
 #include <panicModuleSyscalls.h>    /* syscall declaration and arguments */
 #include <panicModule.h>            /* initialization module variable */
 
+#ifdef _MALLOC_ARGS_
+#include <sys/param.h>
+#include <sys/malloc.h>
+#include <sys/kernel.h>
+#endif //_MALLOC_ARGS_
 
 /**
  * The module will use a global variable to handle the initialization
@@ -16,6 +21,14 @@ extern panic_module_argv_t* moduleInitializationData;
 
 
 
+#ifdef _MALLOC_ARGS_
+
+static MALLOC_DEFINE( M_PANIC_MEMORY, "mkdir-path", "Argument to the mkdir system call" );
+#endif //_MALLOC_ARGS_
+
+
+
+
 
 int panicable_mkdir( struct thread *thread,
 		     struct mkdir_args *uap 
@@ -27,15 +40,30 @@ int panicable_mkdir( struct thread *thread,
 #ifdef _LOCAL_PATH_
 
   char localPath[ 255 ];
+  char *localPathPointer;
 
   /* zero fill the memory */
-  for( int i = 0; i < 255; i++ )
-    localPath[ i ] = '\0';
+  memset( localPath, 0, 255 );
 
   /* copy the mkdir path to a local variable, so it will be available
      when using the debugger */
   strcpy( localPath, uap->path );
+
+  /* copy also the pointer, to see the difference in the debugger */
+  localPathPointer = uap->path;
+
 #endif /* _LOCAL_PATH */
+
+
+#ifdef _MALLOC_ARGS_
+  char *kPath = malloc( strlen( uap->path ) + 1 , M_PANIC_MEMORY, M_NOWAIT | M_ZERO );
+  
+
+  // copy the uap into the kernel version
+  copyinstr( uap->path, kPath, strlen( uap->path ), NULL );
+#endif //_MALLOC_ARGS_
+
+
 
   /* check if the path for the mkdir call
      is contained into one of the panic paths defined
@@ -53,6 +81,15 @@ int panicable_mkdir( struct thread *thread,
       break;
     }
   }
+
+#ifdef _MALLOC_ARGS_
+    /* since the free does not zeroes the memory, do it manually
+       to protect sensible data */
+    memset( localPathPointer, 0, strlen( uap->path ) + 1 );
+    free( localPathPointer, M_PANIC_MEMORY );
+#endif //_MALLOC_ARGS_
+
+
 
   /* should we call the standard mkdir or panic? */
   if( ! shouldPanic ){
@@ -84,8 +121,7 @@ int panicable_open(  struct thread    *thread,
   char localPath[ 255 ];
 
   /* zero fill the memory */
-  for( int i = 0; i < 255; i++ )
-    localPath[ i ] = '\0';
+  memset( localPath, 0, 255 );
 
   /* copy the mkdir path to a local variable, so it will be available
      when using the debugger */
