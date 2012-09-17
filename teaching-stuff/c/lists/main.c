@@ -7,15 +7,23 @@
 #include <string.h>
 #include <stdlib.h>
 #include "single_list.h"
+#include "double_list.h"
 
 
 void
 dump_single_list( single_list_entry* head );
 
+void
+dump_double_list( double_list_entry* head );
+
 int
 main( int argc, char** argv ){
   single_list_entry *single_head  = NULL;
   single_list_entry *single_entry = NULL;
+  double_list_entry *double_head  = NULL;
+  double_list_entry *double_entry = NULL;
+
+
   char *payload = malloc( sizeof( char ) * 200 );
   sprintf( payload, "This will be removed from the list!" );
 
@@ -42,6 +50,27 @@ main( int argc, char** argv ){
   printf( "\nThe tail of the list is as follows\n" );
   dump_single_list( s_tail( single_head ) );
 
+
+
+  /* double list management */
+  payload = malloc( sizeof( char ) * 200 );
+  sprintf( payload, "This will be removed from the list!" );
+
+  double_head = d_add( "Hello double linked list world!", NULL );
+  dump_double_list( double_head );
+  double_head = d_add( "Second element", double_head );
+  double_head = d_add( "Third element", double_head );
+  double_head = d_add( "Fourth element", double_head );
+  double_head = d_add( payload, double_head );
+  double_head = d_add( "Sixth element", double_head );
+  dump_double_list( double_head );
+  printf( "\nRemoving an element from the list\n" );
+  double_head = d_remove( d_find( payload, double_head ),
+			  double_head );
+  dump_double_list( double_head );
+  printf( "\nThe tail is as follows\n" );
+  dump_double_list( d_tail( double_head )  );
+
 }
 
 
@@ -57,7 +86,38 @@ dump_single_list( single_list_entry* head ){
     for( j = 0; j < tabify; j++ )
       printf( "\t" );
 
-    printf( ".data = %s\n", (char*) head->data );
+    printf( ".data = %s .next=%pd\n",
+	    (char*) head->data,
+	    head->next );
+    tabify++;
+    
+
+    /* move to the next entry in the list */
+    head = head->next;
+  }while( head != NULL );
+
+  printf( "\n-----------------------------\n" );
+}
+
+
+
+void
+dump_double_list( double_list_entry* head ){
+  int tabify = 1;
+  int j;
+
+  printf( "\n-------- LIST DUMP -----------\n" );
+
+  do{
+
+    for( j = 0; j < tabify; j++ )
+      printf( "\t" );
+
+    printf( ".data = %s\t.next=%p\t.prev=%p\n",
+	    (char*) head->data,
+	    head->next,
+	    head->prev );
+
     tabify++;
     
 

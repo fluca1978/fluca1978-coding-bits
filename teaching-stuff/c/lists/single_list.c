@@ -96,6 +96,7 @@ s_remove( single_list_entry *node, single_list_entry *head ){
 
       free( current->data );
       free( current );
+      break;
     }
     else
       previous = current;
