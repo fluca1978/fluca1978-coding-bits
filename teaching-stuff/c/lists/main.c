@@ -1,6 +1,87 @@
 /* main.c */
 
-/* This main files demonstrates the usage of the single and double linked lists. */
+/* 
+ * This main files demonstrates the usage of the single and double linked lists.
+
+
+ To compile this program do as folllows:
+
+ gcc -g -o list.exe main.c double_lists.h double_lists.c single_list.c single_list.h
+
+
+ and run it as
+
+ ./list.exe
+
+
+ The following is an example of output:
+
+ 
+Welcome to the list example
+
+-------- LIST DUMP -----------
+	.data = Hello World .next=(nil)d
+
+-----------------------------
+
+-------- LIST DUMP -----------
+	.data = Fifth element .next=0xdaf140d
+		.data = This will be removed from the list! .next=0xdaf120d
+			.data = Third element .next=0xdaf100d
+				.data = Second element .next=0xdaf0e0d
+					.data = Hello World .next=(nil)d
+
+-----------------------------
+
+Remove an element
+-------- LIST DUMP -----------
+	.data = Fifth element .next=0xdaf120d
+		.data = Third element .next=0xdaf100d
+			.data = Second element .next=0xdaf0e0d
+				.data = Hello World .next=(nil)d
+
+-----------------------------
+
+The tail of the list is as follows
+
+-------- LIST DUMP -----------
+	.data = Hello World .next=(nil)d
+
+-----------------------------
+
+-------- LIST DUMP -----------
+	.data = Hello double linked list world!	.next=(nil)	.prev=(nil)
+
+-----------------------------
+
+-------- LIST DUMP -----------
+	.data = Sixth element	.next=0xdaf1e0	.prev=(nil)
+		.data = This will be removed from the list!	.next=0xdaf1c0	.prev=0xdaf200
+			.data = Fourth element	.next=0xdaf1a0	.prev=0xdaf1e0
+				.data = Third element	.next=0xdaf180	.prev=0xdaf1c0
+					.data = Second element	.next=0xdaf140	.prev=0xdaf1a0
+						.data = Hello double linked list world!	.next=(nil)	.prev=0xdaf180
+
+-----------------------------
+
+Removing an element from the list
+
+-------- LIST DUMP -----------
+	.data = Sixth element	.next=0xdaf1c0	.prev=(nil)
+		.data = Fourth element	.next=0xdaf1a0	.prev=0xdaf200
+			.data = Third element	.next=0xdaf180	.prev=0xdaf1c0
+				.data = Second element	.next=0xdaf140	.prev=0xdaf1a0
+					.data = Hello double linked list world!	.next=(nil)	.prev=0xdaf180
+
+-----------------------------
+
+The tail is as follows
+
+-------- LIST DUMP -----------
+	.data = Hello double linked list world!	.next=(nil)	.prev=0xdaf180
+
+-----------------------------
+ */
 
 
 #include <stdio.h>
