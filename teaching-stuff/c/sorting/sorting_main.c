@@ -63,7 +63,6 @@ The program is configured for sorting max 10000 random values
 /*
  * Alghoritm selectors
  */
-
 typedef enum {
   BUBBLE_SORT = 0,               /* DO NOT MOVE! */
   BUBBLE_SORT_AGGRESSIVE,
@@ -159,6 +158,19 @@ main( int argc, char** argv ){
  */
 void 
 run_sort( int whichAlghoritm, int* array_to_sort_src, int start, int end ){
+
+  /* check arguments */
+  if( start < 0
+      || end > MAX_ITEMS
+      || start == end
+      || start > end ) {
+      printf( "\nCannot sort an array that starts on %d and ends on %d", start, end );
+      return;
+    }
+  
+      
+
+
 
   // pointer to the sorter engine
   long (*sorter)(int*, int, int);
