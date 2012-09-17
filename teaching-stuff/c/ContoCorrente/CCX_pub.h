@@ -13,10 +13,13 @@
 typedef struct CCX_PUB {
 
   // riferimento ad un conto corrente normale
-  ContoCorrentePub* contoCorrente;
+  ContoCorrentePub* super;
 
   // metodo che ritorna il numero della carta di credito
   char* (*m_numero_carta)( struct CCX_PUB * );
+
+  // overriding del metodo titolare di ContoCorrentePub
+  char* (*m_titolare)( struct CCX_PUB * );
 
 } ContoCorrenteConCartaPub;
 

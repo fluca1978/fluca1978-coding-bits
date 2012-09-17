@@ -64,11 +64,14 @@ int main(void){
 	printf( "\nCostruzione di un conto con carta di credito\n");
 	ContoCorrenteConCartaPub *ccCarta = abilitaCarta( C1, "123456789" );
 
-	ContoCorrentePub* ccpub = ccCarta->contoCorrente;
+	ContoCorrentePub* ccpub = ccCarta->super;
 	printf( "\nCarta di credito per il conto %s = %s\n",
-		ccCarta->contoCorrente->m_titolare( ccCarta->contoCorrente ),
+		ccCarta->super->m_titolare( ccCarta->super ),
 		ccCarta->m_numero_carta( ccCarta ) );
-	
+
+	printf( "\nTitolare del conto con carta di credito: %s\n",
+		ccCarta->m_titolare( ccCarta )
+		);
 
 
 }

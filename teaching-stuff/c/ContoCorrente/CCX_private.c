@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "CCX_pub.h"
 
 
@@ -18,6 +19,7 @@ typedef struct CCX_private{
   
   // numero della carta di credito
   char* numero_carta;
+
   
 } ContoCorrenteConCartaPrivate;
 
@@ -80,6 +82,25 @@ static char* getNumeroCartaDiCredito( ContoCorrenteConCartaPub *ccpub ){
 
 
 
+/**
+ * Overriding di un metodo della classe superiore.
+ */
+static 
+char*
+getTitolare( ContoCorrenteConCartaPub *ccpub ){
+  if( ccpub == NULL )
+    return NULL;
+
+  ContoCorrenteConCartaPrivate *ccpriv = Public2Private( ccpub );
+  ContoCorrentePub *super              = ccpub->super;
+  char* titolare_super = super->m_titolare( super );
+  char* titolare_desc  = malloc( sizeof( char ) * strlen( titolare_super ) * 2 );
+  sprintf( titolare_desc, "%s (%s)", titolare_super, ccpriv->numero_carta );
+  return titolare_desc;
+}
+
+
+
 
 /**
  * Costruttore di copia da un conto corrente normale 
@@ -104,10 +125,14 @@ ContoCorrenteConCartaPub* abilitaCarta( ContoCorrentePub* contoNormale, char* nu
   ContoCorrentePub* superClass = aperturaContoCorrente( contoNormale->m_numero_conto( contoNormale ), 
 						     contoNormale->m_titolare( contoNormale )
 						    );
-  ccpriv->pub.contoCorrente = superClass;
+  ccpriv->pub.super = superClass;
+
+
 
   // Metodo getter per la carta di credito
   ccpriv->pub.m_numero_carta = getNumeroCartaDiCredito;
+  // metodo ridefinito per ottenere il titolare
+  ccpriv->pub.m_titolare = getTitolare;
 
   // inserisco il numero di carta nella struttura privata
   ccpriv->numero_carta = numero_carta;
