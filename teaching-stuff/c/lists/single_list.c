@@ -169,9 +169,21 @@ s_find( void *data, single_list_entry* head ){
  * \returns the last node in the list
  */
 single_list_entry* 
-s_tail( single_list_entry *head ){
+s_last( single_list_entry *head ){
   for( ; head->next != NULL; head = head->next )
     ;
 
   return head;
+}
+
+
+/**
+ * Provides the tail of the list.
+ *
+ * \param head the current head
+ * \returns the list without the head node or NULL if the head is null
+ */
+single_list_entry* 
+s_tail( single_list_entry *head ){
+  return ( head != NULL ? head->next : NULL );
 }

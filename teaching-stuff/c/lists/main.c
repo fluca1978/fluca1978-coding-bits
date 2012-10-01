@@ -6,7 +6,7 @@
 
  To compile this program do as folllows:
 
- gcc -g -o list.exe main.c double_lists.h double_lists.c single_list.c single_list.h
+ gcc -g -o list.exe main.c double_list.h double_list.c single_list.c single_list.h
 
 
  and run it as
@@ -16,7 +16,6 @@
 
  The following is an example of output:
 
- 
 Welcome to the list example
 
 -------- LIST DUMP -----------
@@ -25,19 +24,19 @@ Welcome to the list example
 -----------------------------
 
 -------- LIST DUMP -----------
-	.data = Fifth element .next=0xdaf140d
-		.data = This will be removed from the list! .next=0xdaf120d
-			.data = Third element .next=0xdaf100d
-				.data = Second element .next=0xdaf0e0d
+	.data = Fifth element .next=0xd19140d
+		.data = This will be removed from the list! .next=0xd19120d
+			.data = Third element .next=0xd19100d
+				.data = Second element .next=0xd190e0d
 					.data = Hello World .next=(nil)d
 
 -----------------------------
 
 Remove an element
 -------- LIST DUMP -----------
-	.data = Fifth element .next=0xdaf120d
-		.data = Third element .next=0xdaf100d
-			.data = Second element .next=0xdaf0e0d
+	.data = Fifth element .next=0xd19120d
+		.data = Third element .next=0xd19100d
+			.data = Second element .next=0xd190e0d
 				.data = Hello World .next=(nil)d
 
 -----------------------------
@@ -45,7 +44,9 @@ Remove an element
 The tail of the list is as follows
 
 -------- LIST DUMP -----------
-	.data = Hello World .next=(nil)d
+	.data = Third element .next=0xd19100d
+		.data = Second element .next=0xd190e0d
+			.data = Hello World .next=(nil)d
 
 -----------------------------
 
@@ -55,30 +56,33 @@ The tail of the list is as follows
 -----------------------------
 
 -------- LIST DUMP -----------
-	.data = Sixth element	.next=0xdaf1e0	.prev=(nil)
-		.data = This will be removed from the list!	.next=0xdaf1c0	.prev=0xdaf200
-			.data = Fourth element	.next=0xdaf1a0	.prev=0xdaf1e0
-				.data = Third element	.next=0xdaf180	.prev=0xdaf1c0
-					.data = Second element	.next=0xdaf140	.prev=0xdaf1a0
-						.data = Hello double linked list world!	.next=(nil)	.prev=0xdaf180
+	.data = Sixth element	.next=0xd191e0	.prev=(nil)
+		.data = This will be removed from the list!	.next=0xd191c0	.prev=0xd19200
+			.data = Fourth element	.next=0xd191a0	.prev=0xd191e0
+				.data = Third element	.next=0xd19180	.prev=0xd191c0
+					.data = Second element	.next=0xd19140	.prev=0xd191a0
+						.data = Hello double linked list world!	.next=(nil)	.prev=0xd19180
 
 -----------------------------
 
 Removing an element from the list
 
 -------- LIST DUMP -----------
-	.data = Sixth element	.next=0xdaf1c0	.prev=(nil)
-		.data = Fourth element	.next=0xdaf1a0	.prev=0xdaf200
-			.data = Third element	.next=0xdaf180	.prev=0xdaf1c0
-				.data = Second element	.next=0xdaf140	.prev=0xdaf1a0
-					.data = Hello double linked list world!	.next=(nil)	.prev=0xdaf180
+	.data = Sixth element	.next=0xd191c0	.prev=(nil)
+		.data = Fourth element	.next=0xd191a0	.prev=0xd19200
+			.data = Third element	.next=0xd19180	.prev=0xd191c0
+				.data = Second element	.next=0xd19140	.prev=0xd191a0
+					.data = Hello double linked list world!	.next=(nil)	.prev=0xd19180
 
 -----------------------------
 
 The tail is as follows
 
 -------- LIST DUMP -----------
-	.data = Hello double linked list world!	.next=(nil)	.prev=0xdaf180
+	.data = Fourth element	.next=0xd191a0	.prev=0xd19200
+		.data = Third element	.next=0xd19180	.prev=0xd191c0
+			.data = Second element	.next=0xd19140	.prev=0xd191a0
+				.data = Hello double linked list world!	.next=(nil)	.prev=0xd19180
 
 -----------------------------
  */

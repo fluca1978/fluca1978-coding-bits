@@ -40,4 +40,8 @@ d_find( void *payload, double_list_entry *head );
 double_list_entry*
 d_tail( double_list_entry* head );
 
+double_list_entry*
+d_last( double_list_entry* head );
+
+
 #endif	/* DOUBLE_LISTS */

@@ -120,8 +120,13 @@ d_find( void *payload, double_list_entry *head ){
   
 }
 
+/**
+ * Provides the last element in the list (going forward).
+ * \param head the head of the list
+ * \returns the last element of the list
+ */
 double_list_entry*
-d_tail( double_list_entry* head ){
+d_last( double_list_entry* head ){
   
   /* check arguments */
   if( head == NULL )
@@ -131,4 +136,15 @@ d_tail( double_list_entry* head ){
     ;
 
   return head;
+}
+
+
+/**
+ * Provides the tail of the list, that is the list without the current head.
+ * \param head the head of the list
+ * \returns the tail of the list or null
+ */
+double_list_entry*
+d_tail( double_list_entry* head ){
+  return ( head != NULL ? head->next : NULL );
 }

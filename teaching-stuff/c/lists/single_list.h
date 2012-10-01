@@ -24,5 +24,6 @@ single_list_entry* s_remove( single_list_entry *node, single_list_entry *head );
 single_list_entry* s_insert( single_list_entry *node, single_list_entry *head );
 single_list_entry* s_find( void *data, single_list_entry* head );
 single_list_entry* s_tail( single_list_entry *head );
+single_list_entry* s_last( single_list_entry *head );
 
 #endif	/* LISTS_SINGLE_LIST */
