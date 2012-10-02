@@ -1,0 +1,22 @@
+This is a sample of the output of the program:
+
+$ perl main.pl
+
+
+Welcome to the context simple example
+
+Testing a scalar context
+
+The result is as follows
+	Called in a scalar context with 3 arguments: A,B,C
+
+Testing a list context
+
+The result is as follows
+	Called in a list context 3 arguments A B C
+
+Using the ref operator to understand what results...
+
+SCALAR in an assignement to a scalar variable: SCALAR
+
+LIST   in an assignement to an array: ARRAY
