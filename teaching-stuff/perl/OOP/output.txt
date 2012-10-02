@@ -1,0 +1,69 @@
+The following is an example of output of this program when called as
+$ perl main.pl
+
+Welcome to a simple Perl example to demonstrate the usage of
+modules as classes and objects
+
+Person is Person
+Created a person
+	{Person with ID = 1} Name = Luca Surname = Ferrari 
+
+Created a person
+	{Person with ID = 2} Name = Luca Surname = Ferrari 
+
+Created a person
+	{Person with ID = 3} Name = Luca Surname = Ferrari 
+
+The static variable Person::instance_counter is 3
+
+Creating an object from another object has failed
+
+Cloned a person
+	{Person with ID = 4} Name = Luca Surname = Ferrari 
+
+Cannot set a name on a class!
+
+Created a student
+	{Student with ID = 5} Name = Alfred Surname = Einstein  UNIVERSITY = Nipissing University
+
+The first person is a person
+
+The first person is not a student
+
+The first student is a person
+
+The first student is a student
+luca@lferrar3:~/tmp/fluca1978-coding-bits/teaching-stuff/perl$ perl main.pl 
+
+Welcome to a simple Perl example to demonstrate the usage of
+modules as classes and objects
+
+Person is Person
+Created a person
+	{Person with ID = 1} Name = Luca Surname = Ferrari 
+
+Created a person
+	{Person with ID = 2} Name = Luca Surname = Ferrari 
+
+Created a person
+	{Person with ID = 3} Name = Luca Surname = Ferrari 
+
+The static variable Person::instance_counter is 3
+
+Creating an object from another object has failed
+
+Cloned a person
+	{Person with ID = 4} Name = Luca Surname = Ferrari 
+
+Cannot set a name on a class!
+
+Created a student
+	{Student with ID = 5} Name = Alfred Surname = Einstein  UNIVERSITY = Nipissing University
+
+The first person is a person
+
+The first person is not a student
+
+The first student is a person
+
+The first student is a student
