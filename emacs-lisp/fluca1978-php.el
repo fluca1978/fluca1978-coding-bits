@@ -56,6 +56,9 @@
 		  ?\n ?\n
 		  "/**" ?\n
 		  " * " class-comment ?\n
+		  " * " ?\n
+		  " * " ?\n
+		  " * \\author " user-full-name " " user-mail-address ?\n
 		  " */" ?\n
 		  "class " class-name " {" ?\n ?\n
 		  "/**" ?\n
@@ -189,6 +192,8 @@
 			      "/**" ?\n
 			      "* Getter for the property " property-name "." ?\n
 			      "* \\returns the current value of the property " property-name ?\n
+			      "*" ?\n
+			      "* \\author " user-full-name " " user-mail-address ?\n
 			      "*/" ?\n
 			      "public function " getter-name "(){"
 			      ?\n ?\t 
@@ -204,7 +209,9 @@
 		       ?\n ?\t 
 		       "/**" ?\n
 		       "* Setter of the property " property-name "." ?\n
-		       "* \\param " setter-arg-name " the new value for the property" ?\n
+		       "* \\param " setter-arg-name " the new value for the property" ?\n 
+		       "*" ?\n
+		       "* \\author " user-full-name " " user-mail-address ?\n
 		       "*/" ?\n
 		       "public function " setter-name "( " setter-arg-name " ){"
 		       ?\n ?\t 
