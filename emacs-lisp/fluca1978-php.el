@@ -7,7 +7,10 @@
 ;;
 ;;
 ;; Commands defined in this file:
-;; - php-class defines a new class in a new buffer without saving it
+;; - php-class defines a new class in a new buffer saving it in the current
+;;             working directory
+;; - php-class-in-path defines a new PHP class skeleton in a saved buffer
+;;                     asking the user for the path where to save the buffer
 ;; - php-prop  defines a new property with getter and setter methods
 ;;
 ;;
@@ -18,20 +21,27 @@
 
 ;; -----------------------------------------------------------------------------------
 
-
+;; Creates a new PHP class skeleton in the current path.
 (defun php-class (class-name class-comment)
+  (interactive "sClass name: \nsOptional comment for the class: ")
+  (php-class-in-path class-name "." class-comment)
+  )
+
+;; Creates a new empty PHP class skeleton in a new saved buffer
+;; with the specified file path.
+(defun php-class-in-path (class-name class-file-path class-comment )
   "Creates a new class in an empty buffer.
    The function generates a capitalized version of the class name and ensures
    that no other files with the same class name already exist in the
    current path"
   ;; prompt the user for the data to insert
-  (interactive "sClass name: \nsOptional comment for the class: ")
+  (interactive "sClass name: \nsClass file path: \nsOptional comment for the class: ")
   ;; check that the user has inserted a good class name
   (if (equal "" class-name)
       (message "Cannot create a class without a name!")
     (let* ((class-name (concat (capitalize (substring class-name 0 1) )
 			       (substring class-name 1) ) ) 
-	   (class-file-name (concat class-name ".php") ) ; the name of the file
+	   (class-file-name (concat class-file-path "/" class-name ".php") ) ; the name of the file
 	   )
       ;; ensure that the file that will hold the class does not exists
       ;; already
@@ -69,8 +79,10 @@
 
 	  ;; indent the created region (whole buffer)
 	  (c-indent-region (point-min) (point-max) t)
-
-	  (message "Generation of the class %s done" class-name)
+	  (save-buffer)
+	  (message "Generation of the class %s done, file %s saved!" 
+		   class-name class-file-name )
+	  
 
 	  )					; end of the progn
 	)					; end of the if on the file name
