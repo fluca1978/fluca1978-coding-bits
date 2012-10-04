@@ -20,7 +20,10 @@
 
 
 (defun php-class (class-name class-comment)
-  "Creates a new class in an empty file and saves it"
+  "Creates a new class in an empty buffer.
+   The function generates a capitalized version of the class name and ensures
+   that no other files with the same class name already exist in the
+   current path"
   ;; prompt the user for the data to insert
   (interactive "sClass name: \nsOptional comment for the class: ")
   ;; check that the user has inserted a good class name
@@ -29,38 +32,48 @@
     (let* ((class-name (concat (capitalize (substring class-name 0 1) )
 			       (substring class-name 1) ) ) 
 	   (class-file-name (concat class-name ".php") ) ; the name of the file
-	   (class-edit-point 0)				 ; where to start to edit
 	   )
-      ;; generate the buffer or visit it
-      (switch-to-buffer (find-file-noselect class-file-name))
-      ;; insert the beginning of the class
-      (insert "<?php" ?\n
-	      ?\t "/* " class-file-name " */" ?\n
-	      ?\n ?\n
-	      "/**" ?\n
-	      " * " class-comment ?\n
-	      " */" ?\n
-	      "class " class-name " {" ?\n
-	      )
-      (setq class-edit-point (point) ) ; store where the editing should start
+      ;; ensure that the file that will hold the class does not exists
+      ;; already
+      (if (file-exists-p class-file-name) 
+	  (message "The file %s already exists, aborting!" class-file-name)
+	(progn
+	  ;; generate the buffer or visit it
+	  (switch-to-buffer (find-file-noselect class-file-name))
+	  ;; insert the beginning of the class
+	  (insert "<?php" ?\n
+		  ?\t "/* " class-file-name " */" ?\n
+		  ?\n ?\n
+		  "/**" ?\n
+		  " * " class-comment ?\n
+		  " */" ?\n
+		  "class " class-name " {" ?\n ?\n
+		  "/**" ?\n
+		  " * Default constructor" ?\n
+		  "*/" ?\n
+		  "public __construct(){" ?\n
+		  ?\t "/* parent::__construct(); */" ?\n
+		  "}" ?\n ?\n ?\n
+		  
+		  )
+	  
+	  ;; insert the end of the class
+	  ;; use a save excursion so that the user will start editing from this point
+	  (save-excursion 
+	    (insert ?\n ?\n ?\n
+		    "} /* end of the class */" ?\n
+		    ?\n ?\n
+		    "?>" ?\n
+		    )			; end of the insert block
+	    )
 
-      ;; insert the end of the class
-      (insert ?\n ?\n ?\n
-	      "} /* end of the class */" ?\n
-	      ?\n ?\n
-	      "?>" ?\n
-	      )			; end of the insert block
+	  ;; indent the created region (whole buffer)
+	  (c-indent-region (point-min) (point-max) t)
 
-      ;; indent the created region (whole buffer)
-      (c-indent-region (point-min) (point-max) t)
+	  (message "Generation of the class %s done" class-name)
 
-      ;; place the cursor at the beginning of the class
-      (goto-char class-edit-point)
-
-      (message "Generation of the class done, start editing at line %d (char %d)" 
-	       (count-lines 1 class-edit-point)
-	       class-edit-point)
-
+	  )					; end of the progn
+	)					; end of the if on the file name
       )					; end of the let
     )						; end of the if
   )					; end of defun
