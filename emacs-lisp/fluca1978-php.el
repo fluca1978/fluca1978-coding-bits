@@ -3,6 +3,8 @@
 ;; This file provides some simple functions to enhance the Emacs library
 ;; in order to allow and automate some PHP related tasks, such as creating
 ;; new classes, new properties into classes, and so on.
+;; This extension does not require the php-mode to be loaded, even if
+;; it is suggested that you load the mode in your configuration.
 ;;
 ;;
 ;;
@@ -20,6 +22,10 @@
 
 
 ;; -----------------------------------------------------------------------------------
+
+
+;; -----------------------------------------------------------------------------------
+
 
 ;; Creates a new PHP class skeleton in the current path.
 (defun php-class (class-name class-comment)
