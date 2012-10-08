@@ -72,11 +72,16 @@
 	    (visiting-buffer-filename nil)		     ; the buffer the user has invoked this function onto
 	    (visiting-point           nil)		     ; where the user was editing
 	    (class-beginning-point    nil)		     ; where the class starts in the header
+	    (setter-regexp-signature  nil)		     ; the signature of a setter method
+	    (getter-regexp-signature  nil)		     ; the signature of a getter method
+	    (property-regexp-signature nil)		     ; the regexp for the property declaration
 	    ) 				; end of the let variable list
 
 	;; remember the current cursor position in the buffer
 	(save-excursion
 	  (progn
+
+
 
 	    ;; I need to try to understand what kind of buffer I am visiting:
 	    ;; if it is an header file, than it must contain the class declaration
@@ -88,13 +93,13 @@
 		  (goto-char (point-min))
 		  (setq insert-methods-in-header t) ; insert the methods into the header
 
-		  (if (re-search-forward "class[ \t\s\n]+\\(.+\\)[ \t\s\n]*\\(.*\\)[ \t\s\n]*[{]$" 
+		  (if (re-search-forward "class[ \t\s\n]+\\(\\w+\\)[ \t\s\n]*\\(.*\\)[ \t\s\n]*[{]$" 
 					 nil t 1 )
 		      (progn
 			;; the user is editing the header file, so I guess
 			;; she wants to insert the getter/setter into the header file
 			;; itself
-			(setq class-name "LUCA")
+			(setq class-name (match-string 1) )
 			(setq insert-methods-in-header t)
 			(setq class-beginning-point (point))
 
@@ -136,11 +141,19 @@
 		 )
 
 
+	    ;; build the regexp signature for the getter and setter methods
+	    (setq getter-regexp-signature (concat "[ \s\n\t]*" property-type "[ \s\n\t]+" getter-name "[ \s\n\t]*([ \s\n\t]*)" ) )
+	    (setq setter-regexp-signature (concat "[ \s\n\t]*void[ \s\n\t]+" setter-name "[ \s\n\t]*([ \s\n\t]*" property-type "[ \s\n\t]+\\(\\w+\\)[ \s\n\t]*)" ) )
+	    ;; the regexp for the property sitgnature
+	    (setq property-regexp-signature (concat "[\s \t\n]*"  property-name) )
+	    
+
+
 	    ;; I need to check if the property has been already defined in the
 	    ;; header file (under the private section)
 
 	    (goto-char class-beginning-point)	; move to the beginning of the class
-	    (if (re-search-forward (concat "[\s \t\n]*"  property-name) nil t 1)
+	    (if (re-search-forward property-regexp-signature nil t 1)
 		(progn
 		  (goto-char (point-max) )
 		  (search-backward "}")
@@ -203,14 +216,15 @@
 		    )
 		  )
 
+
 		;; search for the getter/setter
 		(goto-char method-insertion-point)
-		(if (re-search-forward (concat "[ \s\n\t]*" property-type "[ \s\n\t]+" getter-name "[ \s\n\t]*([ \s\n\t]*)" ) nil t 1 )
+		(if (re-search-forward getter-regexp-signature nil t 1 )
 		    (setq generate-getter nil)
 		  (setq generate-getter t)
 		  )
 		(goto-char method-insertion-point)
-		(if (re-search-forward (concat "[ \s\n\t]*void[ \s\n\t]+" setter-name "[ \s\n\t]*([ \s\n\t]*" property-type "[ \s\n\t]+\\(.+\\)[ \s\n\t]*)" ) nil t 1 )
+		(if (re-search-forward setter-regexp-signature nil t 1 )
 		    (setq generate-setter nil)
 		  (setq generate-setter t)
 		  )
