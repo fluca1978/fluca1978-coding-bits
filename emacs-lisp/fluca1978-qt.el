@@ -343,7 +343,6 @@
 	  )
 	)
 	;;  go forward in the list
-	(read-from-minibuffer (concat "Searching forward " current-include))
 	(setq include-list (cdr include-list) )
 	)
       )
@@ -376,11 +375,17 @@
 	  (setq include-insertion-point (qt-find-include-insertion-point class-beginning-point ) )
 	  (unless (null generate-include)
 	    (goto-char include-insertion-point)
-	    (insert ?\n
-		    "#include <" (qt-guess-include property-type) ">"
-		    ?\t "/* guessed for the property " property-name " */"
-		    ?\n
-		    )
+	    (while include-list-to-generate
+	      (progn
+		(setq current-include (car include-list-to-generate))
+		(insert ?\n
+			"#include <" current-include ">"
+			?\t "/* guessed for the property " property-name " */"
+			?\n
+			)
+		)
+	      (setq include-list-to-generate (cdr include-list-to-generate))
+	      )
 	    
 	    ;; compute the offset of the other variables (since I have inserted the include
 	    ;; the class and property starting points have changed)
