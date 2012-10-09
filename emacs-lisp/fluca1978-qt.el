@@ -295,6 +295,9 @@
 	  (class-beginning-point     nil)
 	  (include-insert-point      (point-min))
 	  (generate-include          nil)
+	  (current-include           nil)
+	  (include-list              nil)
+	  (include-list-to-generate  nil)
 	  )
     (progn
 
@@ -323,12 +326,25 @@
 
 
       ;; Check if I have also to generate the header for the property type
-      ;; (qt-guess-include property-type) ?\n
-      (goto-char (point-min))
-      (if (re-search-forward (concat regexp-include-start (qt-guess-include property-type)  regexp-include-end) nil t 1  )
-	  (setq generate-include nil)
-	(setq generate-include t)
+      (setq include-list (qt-guess-include property-type) )
+      (while include-list 
+	(setq current-include (car include-list))
+	(unless (equal "" current-include)
+	;;  search for the current include
+	(goto-char (point-min))
+	(read-from-minibuffer (concat "Searching include " current-include))
+	(if (re-search-forward (concat regexp-include-start current-include  regexp-include-end) nil t 1  )
+	    (setq generate-include nil)
+	  (progn
+	    ;;  this include is missing, add it to the list of the include to be generated
+	    (setq generate-include t)
+	    (add-to-list 'include-list-to-generate current-include)
+	  )
 	)
+	;;  go forward in the list
+	(setq include-list (cdr include-list))
+	)
+      )
 
       
 
@@ -491,30 +507,54 @@
 
 ;; Try to guess the include file from the property file.
 (defun qt-guess-include (property-type)
-  (let ((include-file nil))
+  (let ((include-file '() ) (current-include nil) (current-recursive-property-type) )
+
+
+    (if (null property-type)
+	nil
+      )
 
     ;; clear the property type
+    (if (string-match "^<*\\(\\w+\\)>*$" property-type)
+	(setq property-type (match-string 1 property-type))
+      )
+
 
     ;; does the property type include a template pattern?
     ;; (e.g., QList<QObject*>)
-    (if (string-match "\\(\\w+\\)\\([<\\w+>]*\\)" property-type)
-	(setq property-type (match-string 1 property-type) )
+    (if (string-match "\\(\\w+\\)<\\(.+\\)" property-type)
+	(progn
+	  (setq current-include (match-string 1 property-type) )
+	  (setq current-recursive-property-type (match-string 2 property-type))
+	  ;; recursive call
+	  (if (not (null current-recursive-property-type) )
+		   (add-to-list 'include-file (qt-guess-include current-recursive-property-type))
+		   
+	      )
+	)
+      ;; if the regular expression does not match, this include is the property itself!
+      (setq current-include property-type)
       )
+
+
 
 
     ;; does the property type include a reference or pointer?
     ;; (e.g., QObject* or QObject&)
-    (if (string-match "[\*\&]?$" property-type)
-	(setq property-type (replace-match "" nil nil property-type))
+    (if (string-match "[*&]?$" current-include)
+	(setq current-include (replace-match "" nil nil current-include))
       )					; end of if 
+
+
 
     ;; the include should be the property found. By default, if the
     ;; property type is a Qclass do not append the .h suffix.
-    (if (string-match "[Q].+" property-type)
-	(setq  include-file property-type)
-      (setq include-file (concat property-type ".h") )
+    (if (string-match "Q^.+" current-include)
+      	(add-to-list  'include-file current-include)
+      (add-to-list 'include-file (concat current-include ".h" ) )
       )
-	    
+
+
     ;; return the include
     include-file
 
