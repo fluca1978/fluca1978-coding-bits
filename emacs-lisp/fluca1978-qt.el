@@ -29,13 +29,6 @@
     (setq property-type (qt-field-type property-type))
 
 
-    ;; TODO
-    ;; trovare il nome della classe corrente,e da quello costruire i nomi
-    ;; dei file header e cpp
-    ;; poi andare nella classe in header e trovare il punto di inserimento del
-    ;; proprieta' e mettere in fondo al file cpp i metodi di inserimento
-    ;; del getter/setter
-
 
     (if (equal "_" property-name) 
 	;; the user has not specified the property name!
@@ -381,8 +374,8 @@
 		(insert ?\n
 			"#include <" current-include ">"
 			?\t "/* guessed for the property " property-name " */"
-			?\n
 			)
+		(insert ?\n)
 		)
 	      (setq include-list-to-generate (cdr include-list-to-generate))
 	      )
