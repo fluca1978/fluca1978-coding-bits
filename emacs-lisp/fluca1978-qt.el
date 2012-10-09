@@ -327,6 +327,7 @@
 
       ;; Check if I have also to generate the header for the property type
       (setq include-list (qt-guess-include property-type) )
+      (setq generate-include nil)
       (while include-list 
 	(setq current-include (car include-list))
 	(unless (equal "" current-include)
@@ -334,7 +335,7 @@
 	(goto-char (point-min))
 	(read-from-minibuffer (concat "Searching include " current-include))
 	(if (re-search-forward (concat regexp-include-start current-include  regexp-include-end) nil t 1  )
-	    (setq generate-include nil)
+	    ()
 	  (progn
 	    ;;  this include is missing, add it to the list of the include to be generated
 	    (setq generate-include t)
@@ -342,7 +343,8 @@
 	  )
 	)
 	;;  go forward in the list
-	(setq include-list (cdr include-list))
+	(read-from-minibuffer (concat "Searching forward " current-include))
+	(setq include-list (cdr include-list) )
 	)
       )
 
@@ -528,7 +530,7 @@
 	  (setq current-recursive-property-type (match-string 2 property-type))
 	  ;; recursive call
 	  (if (not (null current-recursive-property-type) )
-		   (add-to-list 'include-file (qt-guess-include current-recursive-property-type))
+		   (setq include-file (append include-file (qt-guess-include current-recursive-property-type)) )
 		   
 	      )
 	)
@@ -560,6 +562,7 @@
 
     )					; end of let body
 )					; end of defun
+
 
 
 
