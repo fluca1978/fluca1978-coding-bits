@@ -497,8 +497,8 @@
 
     ;; does the property type include a template pattern?
     ;; (e.g., QList<QObject*>)
-    (if (string-match "\\(.+\\)[<]+\\(.+\\)[>]" property-type)
-	(setq property-type (match-string 1) )
+    (if (string-match "\\(\\w+\\)\\([<\\w+>]*\\)" property-type)
+	(setq property-type (match-string 1 property-type) )
       )
 
 
