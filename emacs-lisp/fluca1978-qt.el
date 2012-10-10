@@ -370,9 +370,9 @@
 	    (goto-char include-insertion-point)
 	    ;; add a comment for the includes
 	    (insert ?\n
-		    "/* the following " 
-		    (length include-list-to-generate) 
-		    "* includes have been guessed for the "
+		    (format "/* the following %d includes" (length include-list-to-generate) )
+		    ?\n
+		    "* have been " ?" "guessed" ?" " for the "
 		    ?\n "* class field " property-name
 		    ?\n "*/"
 		    )
