@@ -319,7 +319,7 @@
 
 
       ;; Check if I have also to generate the header for the property type
-      (setq include-list (qt-guess-include property-type) )
+      (setq include-list (guess-include-types property-type) )
       (setq generate-include nil)
       (while include-list 
 	(setq current-include (car include-list))
@@ -368,17 +368,28 @@
 	  (setq include-insertion-point (qt-find-include-insertion-point class-beginning-point ) )
 	  (unless (null generate-include)
 	    (goto-char include-insertion-point)
+	    ;; add a comment for the includes
+	    (insert ?\n
+		    "/* the following " 
+		    (length include-list-to-generate) 
+		    "* includes have been guessed for the "
+		    ?\n "* class field " property-name
+		    ?\n "*/"
+		    )
+					       
 	    (while include-list-to-generate
 	      (progn
 		(setq current-include (car include-list-to-generate))
 		(insert ?\n
 			"#include <" current-include ">"
-			?\t "/* guessed for the property " property-name " */"
 			)
-		(insert ?\n)
 		)
 	      (setq include-list-to-generate (cdr include-list-to-generate))
-	      )
+	      )				; end of the while that generates each include
+	    (insert ?\n)
+
+	    ;; indent the includes
+	    (c-indent-region include-insertion-point (point) t)
 	    
 	    ;; compute the offset of the other variables (since I have inserted the include
 	    ;; the class and property starting points have changed)
@@ -514,10 +525,14 @@
 	nil
       )
 
+
+
     ;; clear the property type
-    (if (string-match "^<*\\(\\w+\\)>*$" property-type)
+    (if (string-match "^<*\\(\\w+\\)[*&>]*$" property-type)
 	(setq property-type (match-string 1 property-type))
       )
+
+
 
 
     ;; does the property type include a template pattern?
@@ -541,21 +556,23 @@
 
     ;; does the property type include a reference or pointer?
     ;; (e.g., QObject* or QObject&)
-    (if (string-match "[*&]?$" current-include)
+    (if (string-match "[*&]+$" current-include)
 	(setq current-include (replace-match "" nil nil current-include))
       )					; end of if 
 
 
-
     ;; the include should be the property found. By default, if the
     ;; property type is a Qclass do not append the .h suffix.
-    (if (string-match "Q^.+" current-include)
-      	(add-to-list  'include-file current-include)
-      (add-to-list 'include-file (concat current-include ".h" ) )
+    (if (string-match "^[A-Z].+" current-include)
+	(if (string-match "^Q.+" current-include)
+	    (add-to-list  'include-file current-include)
+	  (add-to-list 'include-file (concat current-include ".h" ) )
+	  )
+      (read-from-minibuffer "Skipping the type")
       )
 
-
-    ;; return the include
+    (read-from-minibuffer (concat "there " (car include-file) )    )    
+    ;; return the list generated
     include-file
 
     )					; end of let body
@@ -583,3 +600,79 @@
     
     )				; end of the let body
   )					; end of defun
+
+
+;; A function to guess the include types having the property type specified by the user.
+;; The function splits the property with templates in each word, checking each character
+;; and composing a list of types. Therefore the property type QObject<QList>
+;; will return a list ( QObject QList )
+;; 
+(defun guess-include-types (property-type)
+  (let (
+	(current-index       0)
+	(current-char      nil)
+	(include-type-list nil)
+	(current-type      nil)
+	)
+
+    ;; iterate over each char of the property type string
+    (while (< current-index (length property-type))
+      ;; store the current charater within the original string
+      (setq current-char (aref property-type current-index))
+
+      ;; is the character a < or >?
+      (if (or (char-equal current-char ?\<) (char-equal current-char ?\>))
+	  (when current-type
+	    (let ((case-fold-search nil))
+	      ;; here the current-type word has the almost clean data type,
+	      ;; but an extra work has to be done before inserting it in the
+	      ;; include list.
+
+	      ;; translate the string made by ascii refs to a real string
+	      (setq current-type (coerce (reverse current-type) 'string) )
+
+	      ;; First remove any reference char at the end of the type
+	      (if (string-match "[*&]+$" current-type)
+		  (setq current-type (replace-match "" nil nil current-type))
+		)					; end of if 
+
+	      ;; Second: assume that a lower-case starting word
+	      ;; does mean a scalar simple type (like int) and therefore
+	      ;; no include is required. Moreover, in the case of a Q* type
+	      ;; assume it is a Qt type and therefore does not place the
+	      ;; .h suffix
+	      (if (string-match "^[A-Z].+" current-type)
+		  (if (string-match "^Q.+" current-type)
+		      ()
+		    (setq current-type (concat current-type ".h"))
+		    )
+		(setq current-type nil)
+		)	      
+
+	      (unless (null current-type)
+		  (add-to-list 'include-type-list current-type)
+		)
+		 
+	      (setq current-type nil)
+	      )
+	    ) 				;end of the when
+	    
+	    (unless (member current-char '(?\, ?\ ) )
+	      (setq current-type (cons current-char current-type))
+	      )				; end of the unless
+	    
+	  )				; end of the if for <>
+	(incf current-index)		; increment the index to point to the next char
+
+      )					; end of the while body
+
+
+    ;;  order the list and return it
+    (reverse include-type-list)
+    
+
+    )					; end of the let body
+
+
+
+)					; end of defun
