@@ -4,11 +4,11 @@
 
 
 ;; A regexp used to find where a class declaration starts in an header file.
-(defvar regexp-class-declaration "class[ \t\s\n]+\\(\\w+\\)[ \t\s\n]*\\(.*\\)[ \t\s\n]*[{]$")
+(defconst regexp-class-declaration "class[ \t\s\n]+\\(\\w+\\)[ \t\s\n]*\\(.*\\)[ \t\s\n]*[{]$")
 
 ;; regular expression to find and match the include start and end
-(defvar regexp-include-start "[ \t\s]*#include[ \t\s]+[\"<]+")
-(defvar regexp-include-end   "[\">]+")
+(defconst regexp-include-start "[ \t\s]*#include[ \t\s]+[\"<]+")
+(defconst regexp-include-end   "[\">]+")
 
 
 ;; Create a new property, that is a variable with private accessor
