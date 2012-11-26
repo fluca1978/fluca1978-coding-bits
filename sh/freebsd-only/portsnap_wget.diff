@@ -1,0 +1,53 @@
+268c268,270
+< 	PHTTPGET=/usr/libexec/phttpget
+---
+> 	PHTTPGET=/usr/local/bin/wget
+> 
+> 	echo "WARNING: this version of portsnap is usign $PHTTPGET as Web-HTTP-Get program!"
+687,690c689,694
+< 	tr '|' '-' < patchlist |
+< 	    lam -s "tp/" - -s ".gz" |
+< 	    xargs ${XARGST} ${PHTTPGET} ${SERVERNAME}	\
+< 	    2>${STATSREDIR} | fetch_progress
+---
+> 	# fetch metadata files using wget behind a proxy
+> 	for current_file in `tr '|' '-' < patchlist | lam -s "tp/" - -s ".gz"`
+> 	do
+> 	    ${PHTTPGET} ${SERVERNAME}/${current_file} > /dev/null 2>&1
+> 	done
+> 
+721,724c725,732
+< 	echo ${NDEBUG} "metadata files... "
+< 	lam -s "f/" - -s ".gz" < filelist |
+< 	    xargs ${XARGST} ${PHTTPGET} ${SERVERNAME}	\
+< 	    2>${QUIETREDIR}
+---
+> 	echo ${NDEBUG} "metadata files..."
+> 
+> 	# fetch metadata files using wget behind a proxy
+> 	for current_file in `cat filelist`
+> 	do
+> 	    ${PHTTPGET} ${SERVERNAME}/f/${current_file}.gz  > /dev/null 2>&1
+> 	done
+> 	    
+763,765c771,776
+< 	tr '|' '-' < patchlist | lam -s "bp/" - |
+< 	    xargs ${XARGST} ${PHTTPGET} ${SERVERNAME}	\
+< 	    2>${STATSREDIR} | fetch_progress
+---
+> 
+> 	# fetch metadata files using wget behind a proxy
+> 	for current_file in `tr '|' '-' < patchlist | lam -s "bp/" - -s ".gz"`
+> 	do
+> 	    ${PHTTPGET} ${SERVERNAME}/${current_file}  > /dev/null 2>&1
+> 	done
+794,796c805,809
+< 	lam -s "f/" - -s ".gz" < filelist |
+< 	    xargs ${XARGST} ${PHTTPGET} ${SERVERNAME}	\
+< 	    2>${QUIETREDIR}
+---
+> 	# fetch metadata files using wget behind a proxy
+> 	for current_file in `lam -s "f/" - -s ".gz" < filelist`
+> 	do
+> 	    ${PHTTPGET} ${SERVERNAME}/${current_file}  > /dev/null 2>&1
+> 	done
