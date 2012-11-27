@@ -1,0 +1,5 @@
+This is a simple patch to use wget within portsnap. 
+wget handles better the http_proxy variable, while the phttpget
+internal program does not.
+I've also added a couple of variables to portsnap.conf in order
+to let the user add a hook to use either phttpget and wget.
