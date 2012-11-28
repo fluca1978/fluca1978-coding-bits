@@ -1,39 +1,34 @@
 195a196,206
-> 		# handling wget specific extension
-> 		for wgetX in WGET_ENABLE WGET_CHECK_CERTIFICATES; do
-> 		    eval _=\$${wgetX}
+> 		# handling fetch specific extension
+> 		for fetchX in FETCH_ENABLE;  do
+> 		    eval _=\$${fetchX}
 > 			if [ -z "${_}" ]; then
-> 				eval ${wgetX}=`grep "^${wgetX}=" "${CONFFILE}" |
+> 				eval ${fetchX}=`grep "^${fetchX}=" "${CONFFILE}" |
 > 				    cut -f 2- -d '=' | tail -1 | tr '[:lower:]' '[:upper:]'`
 > 			fi
 > 		done
 > 		
 > 
 > 
-268c279,298
+268c279,293
 < 	PHTTPGET=/usr/libexec/phttpget
 ---
 > 
-> 	# do we need the usage of wget(1) instead of the
+> 	# do we need the usage of fetch(1) instead of the
 > 	# default phttpget?
-> 	if [ "${WGET_ENABLE}" = "YES" ]
+> 	if [ "${FETCH_ENABLE}" = "YES" ]
 > 	then
-> 	    PHTTPGET=/usr/local/bin/wget
+> 	    PHTTPGET=/usr/bin/fetch
 > 	    PHTTPGET_OPTS=""
-> 
-> 	    # skip checking certificates, really dangerous!
-> 	    if [ ! -z "${WGET_CHECK_CERTIFICATES}" -a "${WGET_CHECK_CERTIFICATES}" = "NO" ]
-> 	    then
-> 		PHTTPGET_OPTS="${PHTTPGET_OPTS} --no-check-certificate "
-> 		echo "WARNING: check of certificates is disabled as specified by option WGET_CHECK_CERTIFICATES in $CONFFILE"
-> 	    fi
+> 	    SERVER_PROTOCOL="http://"
 > 	else
 > 	    PHTTPGET=/usr/libexec/phttpget
+> 	    SERVER_PROTOCOL=""
 > 	fi
 > 
 > 	check_downloader
 > 	echo "Will use [$PHTTPGET] as downloader"
-687,690c717,722
+687,690c712,717
 < 	tr '|' '-' < patchlist |
 < 	    lam -s "tp/" - -s ".gz" |
 < 	    xargs ${XARGST} ${PHTTPGET} ${SERVERNAME}	\
@@ -42,10 +37,10 @@
 > 
 > 	for current_file in `tr '|' '-' < patchlist | lam -s "tp/" - -s ".gz"`
 > 	do
-> 	    echo ${PHTTPGET} ${PHTTPGET_OPTS} ${SERVERNAME}/${current_file} > /dev/null 2>&1
+> 	    ${PHTTPGET} ${PHTTPGET_OPTS} ${SERVER_PROTOCOL}${SERVERNAME}/${current_file} > /dev/null 2>${STATSREDIR}
 > 	done
 > 
-721,724c753,760
+721,724c748,754
 < 	echo ${NDEBUG} "metadata files... "
 < 	lam -s "f/" - -s ".gz" < filelist |
 < 	    xargs ${XARGST} ${PHTTPGET} ${SERVERNAME}	\
@@ -53,36 +48,34 @@
 ---
 > 	echo ${NDEBUG} "metadata files..."
 > 
-> 	# fetch metadata files using wget behind a proxy
 > 	for current_file in `cat filelist`
 > 	do
-> 	    echo ${PHTTPGET}  ${PHTTPGET_OPTS} ${SERVERNAME}/f/${current_file}.gz  > /dev/null 2>&1
+> 	    ${PHTTPGET}  ${PHTTPGET_OPTS} ${SERVER_PROTOCOL}${SERVERNAME}/f/${current_file}.gz  > /dev/null 2>${STATSREDIR}
 > 	done
 > 	    
-763,765c799,804
+763,765c793,797
 < 	tr '|' '-' < patchlist | lam -s "bp/" - |
 < 	    xargs ${XARGST} ${PHTTPGET} ${SERVERNAME}	\
 < 	    2>${STATSREDIR} | fetch_progress
 ---
 > 
-> 	# fetch metadata files using wget behind a proxy
 > 	for current_file in `tr '|' '-' < patchlist | lam -s "bp/" - -s ".gz"`
 > 	do
-> 	    echo ${PHTTPGET}  ${PHTTPGET_OPTS} ${SERVERNAME}/${current_file}  > /dev/null 2>&1
+> 	    ${PHTTPGET}  ${PHTTPGET_OPTS} ${SERVER_PROTOCOL}${SERVERNAME}/${current_file}  > /dev/null 2>${STATSREDIR}
 > 	done
-794,796c833,837
+794,796c826,830
 < 	lam -s "f/" - -s ".gz" < filelist |
 < 	    xargs ${XARGST} ${PHTTPGET} ${SERVERNAME}	\
 < 	    2>${QUIETREDIR}
 ---
-> 	# fetch metadata files using wget behind a proxy
+> 
 > 	for current_file in `lam -s "f/" - -s ".gz" < filelist`
 > 	do
-> 	    ${PHTTPGET}  ${PHTTPGET_OPTS} ${SERVERNAME}/${current_file}  > /dev/null 2>&1
+> 	    ${PHTTPGET}  ${PHTTPGET_OPTS} ${SERVER_PROTOCOL}${SERVERNAME}/${current_file}  > /dev/null 2>${STATSREDIR}
 > 	done
-997a1039,1079
+997a1032,1072
 > # check that the downloader program is set into the variable PHTTPGET
-> # and that is executable (in the case of wget(1) it must be available on
+> # and that is executable (in the case of fetch(1) it must be available on
 > # the system.
 > #
 > # In the case the downloader program is not usable the program will be aborted
