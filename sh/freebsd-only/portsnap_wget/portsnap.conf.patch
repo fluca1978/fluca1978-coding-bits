@@ -1,12 +1,7 @@
-36a37,46
+36a37,42
 > 
-> # Enable this option if you want portsnap to use wget(1)
+> # Enable this option if you want portsnap to use fetch(1)
 > # instead of the standard phttpget program to download
 > # all the required files.
-> WGET_ENABLE="YES"
+> FETCH_ENABLE="YES"
 > 
-> # If using wget(1) and dealing with sites with self-signed certificates
-> # turn on this option to allow wget(1) to skip checking the certificate.
-> # WARNING: this could be a risky way of updating the system!!!!
-> #WGET_CHECK_CERTIFICATES="YES"
-\ No newline at end of file
