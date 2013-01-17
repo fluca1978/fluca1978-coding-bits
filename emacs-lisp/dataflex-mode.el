@@ -4,7 +4,8 @@
 ;;  Mode hook, so that users can customize the mode.
 ;;  At the beginning this hook does not contain anything, that is
 ;;  no customization is set up.
-(defvar dataflex-mode-hook nil)
+(defvar dataflex-mode-hook nil 
+  "Dataflex mode hook to allow user customization" )
 
 
 ;;  Define a keymap to specify key bindings.
@@ -16,8 +17,9 @@
 ;; is assigned to the dataflex-mode-map.
 (defvar dataflex-mode-map
   (let ( (df-map (make-keymap) ) )
-    (define-key df-map "\C-j" 'newline-and-indent)
-    (define-key df-map "\C-c\C-t" 'df-transpose-single-line-move)
+    (define-key df-map "\C-j"         'newline-and-indent)
+    (define-key df-map "\C-c\C-t"     'df-transpose-single-line-move)
+    (define-key df-map "\C-C\C-i"     'dataflex-mode-indent-back-from-here)
     df-map )
   "Keyboard map for the Dataflex Mode" )
 
@@ -45,7 +47,7 @@
 (defconst dataflex-font-lock-keywords-main
   (append dataflex-font-lock-keywords-minimal 
 	  (list
-	   '("\\<\\(NAME\\|OPEN\\|SAVERECORD\\UNLOCK\\|CLOSE\\|GOTO\\)\\>" . font-lock-constant-face ) ) )
+	   '("\\<\\(NAME\\|OPEN\\|SAVERECORD\\UNLOCK\\|CLOSE\\|GOTO\\|RETURN\\)\\>" . font-lock-constant-face ) ) )
   "Full keyword list" )
 	   
 
@@ -57,9 +59,9 @@
 
 (defvar dataflex-mode-syntax-table
   (let ( (df-syn-table (make-syntax-table)) )
-    (modify-syntax-entry ?_ "w" df-syn-table)           ; two words with a single _ are seen as one
-    (modify-syntax-entry ?/ ". 12b" df-syn-table)      ; c-like comment with //
-    (modify-syntax-entry ?\n "> b" df-syn-table)	; end of c-like comment by newline
+    (modify-syntax-entry ?_ "w" df-syn-table)           ; two words with a single _ are seen as one	        ;;
+    (modify-syntax-entry ?/ ". 12b" df-syn-table)      ; c++-like comment with //			        ;;
+    (modify-syntax-entry ?\n "> b" df-syn-table)	; end of c++-like comment by newline		        ;;
     df-syn-table )
   "Syntax table for the Dataflex mode" )
 
@@ -67,16 +69,26 @@
 
 
 
-
+;;  A function to wrap comment-dwin so that it is possible to comment in/out a whole region.
+;;  This function will use 'newcomment and use the // as a comment begin mark and nothing as
+;;  a comment end.
 (defun dataflex-comment-dwim (arg)
-  "Comment (in/out) a Dataflex piece of source code. It is based on comment-dwin
-of newcomment.el"
+  "Comment (in/out) a Dataflex piece of source code. 
+It is based on comment-dwin of newcomment.el"
   (interactive "*P")
   (require 'newcomment)
-  (let ( (comment-start "//") (comment-end "") )
+  (let ( (comment-start "// * ") (comment-end " *** ") (comment-style 'box) )
     (comment-dwim arg)))
 
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun df-transpose-single-line-move ()
@@ -99,6 +111,63 @@ of newcomment.el"
 
 
 
+;;  This variable defines the indent space size.
+(defvar dataflex-mode-indent-step 4 
+  "The number of spaces for each indent level" )
+
+(defun dataflex-mode-indent-back-from-here ()
+  "A function to indent to a single level all the code from this line (current one) assuming 
+the line is one of that closes a block (e.g., an END)"
+  (interactive)												        
+				       
+  (beginning-of-line)  														        ;;
+  ;;  at the beginning of the buffer the indentation is always zero						        ;;
+  (if (bobp) 												        ;;
+      (indent-line-to 0) )											        ;;
+  ; else													        ;;
+  (let ( (line-begin-block nil) (line-end-block nil) (current-line-indent-step dataflex-mode-indent-step) )	        ;;
+    (if (looking-at "^[ \t]*\\(RETURN\\|END\\|ABORT\\)[\s \t\n]*$")	; found an explicit END or RETURN
+	  (save-excursion											        ;;
+	    ;;  store this line as the one that marks the end of a block					        ;;
+	    (setq line-end-block (1+ (count-lines 1 (point) ) ) )						        ;;
+														        ;;
+	    ;;  go back one line at time to find the line that opens a block					        ;;
+	    ;;  and store the number of the line that ends the current block					        ;;
+	    (while (null line-begin-block)									        ;;
+	      (forward-line -1)		; go to the previous line						        ;;
+	      (if (bobp)
+		  (setq line-begin-block 1))
+	      (if (looking-at "^[ \t]*\\(IF\\|WHILE\\|BEGIN\\|LOOP\\)" )									        ;;
+		  (progn											        ;;
+		    ;;  this is the line that opens a block
+		    ;;  indentation of the BEGIN block line							        ;;
+		    (setq current-line-indent-step (current-indentation) )					        ;;
+		    ; go to the very next line (the one that needs to be indented)
+		    (forward-line 1)
+		    (setq line-begin-block (1+ (count-lines 1 (point) ) ) )					        ;;
+		    ;;  compute how much the following lines have to be indented				        ;;
+		    (setq current-line-indent-step (+ current-line-indent-step dataflex-mode-indent-step))	        ;;
+														        ;;
+		    )))												        ;;
+							
+
+
+	    (while (< line-begin-block line-end-block)								        ;;
+	      (progn												        ;;
+		(setq line-begin-block (1+ line-begin-block) )
+		(indent-line-to current-line-indent-step) 
+		(forward-line 1) ) ) 
+
+))))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
@@ -114,8 +183,8 @@ of newcomment.el"
   ;;  keywords for the mode
   (set (make-local-variable 'font-lock-defaults) '(dataflex-font-lock-keywords))
   ;;  comments
-  (setq comment-start "// ")
-  (setq comment-end   ""   )
+;  (setq comment-start "// * ")
+;  (setq comment-end   " *"   )
 
   ;;  set the mode info
   (setq major-mode 'dataflex-mode)
