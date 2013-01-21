@@ -181,10 +181,9 @@ the line is one of that closes a block (e.g., an END)"
   (use-local-map dataflex-mode-map )		; set the keyboard map
 
   ;;  keywords for the mode
-  (set (make-local-variable 'font-lock-defaults) '(dataflex-font-lock-keywords))
-  ;;  comments
-;  (setq comment-start "// * ")
-;  (setq comment-end   " *"   )
+  ;;  (the third argument makes the font-locking case insensitive so that both uppercase and
+  ;;  lower case keywords are emphasized)
+  (set (make-local-variable 'font-lock-defaults) '(dataflex-font-lock-keywords nil t) )
 
   ;;  set the mode info
   (setq major-mode 'dataflex-mode)
