@@ -243,7 +243,9 @@ the current word label (if any)."
       ;;  else search the label
       
       (let ( ( label-regexp (concat "^[ \t]*" label-to-jump-to ":") ) 
+	     (original-pos (point) )	; I need to save the original point the user is
 	     (label-line 0) 
+	     (label-pos 0)
 	     (label-window nil) )
 	;;  go to the beginning of the buffer
 	(beginning-of-buffer)
@@ -251,12 +253,18 @@ the current word label (if any)."
 	(if (re-search-forward label-regexp)
 	    (progn
 	      ;;  the label has been found
+	      (setq label-pos (point) )
 	      (setq label-line (line-number-at-pos (point) ) )
-	      (message (format "Label found at line %d" label-line ) )
+	      (goto-char original-pos)
 	      ;;  open a window and jump to the specified label
-	      (setq label-window (split-window-below) )
-	      (select-window label-window)
-	      (goto-line  label-line)  )
+	      (if (null (pos-visible-in-window-p label-pos (selected-window) ) )
+		  (progn
+		    (setq label-window (split-window-below) )
+		    (select-window label-window)
+		    (goto-line  label-line)  )
+		;;  else show the user that the label is visible
+		(message (format "The label is visible on line %d (position %d)!" label-line label-pos) ) ) )
+	  ;;  else cannot find the label in the buffer!
 	  (message (format "Cannot find the label [%s] (searched with [%s]) in this buffer!" label-to-jump-to label-regexp) ) ) ) ) ) )
     
 
