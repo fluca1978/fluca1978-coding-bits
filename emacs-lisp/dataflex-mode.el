@@ -19,7 +19,7 @@
   (let ( (df-map (make-keymap) ) )
     (define-key df-map "\C-j"         'newline-and-indent)
     (define-key df-map "\C-c\C-t"     'df-transpose-single-line-move)
-    (define-key df-map "\C-C\C-i"     'dataflex-mode-indent-back-from-here)
+    (define-key df-map "\C-C\C-i"     'dataflex-indent-region-or-buffer )
     df-map )
   "Keyboard map for the Dataflex Mode" )
 
@@ -115,50 +115,109 @@ It is based on comment-dwin of newcomment.el"
 (defvar dataflex-mode-indent-step 4 
   "The number of spaces for each indent level" )
 
-(defun dataflex-mode-indent-back-from-here ()
-  "A function to indent to a single level all the code from this line (current one) assuming 
-the line is one of that closes a block (e.g., an END)"
-  (interactive)												        
-				       
-  (beginning-of-line)  														        ;;
-  ;;  at the beginning of the buffer the indentation is always zero						        ;;
-  (if (bobp) 												        ;;
-      (indent-line-to 0) )											        ;;
-  ; else													        ;;
-  (let ( (line-begin-block nil) (line-end-block nil) (current-line-indent-step dataflex-mode-indent-step) )	        ;;
-    (if (looking-at "^[ \t]*\\(RETURN\\|END\\|ABORT\\)[\s \t\n]*$")	; found an explicit END or RETURN
-	  (save-excursion											        ;;
-	    ;;  store this line as the one that marks the end of a block					        ;;
-	    (setq line-end-block (1+ (count-lines 1 (point) ) ) )						        ;;
-														        ;;
-	    ;;  go back one line at time to find the line that opens a block					        ;;
-	    ;;  and store the number of the line that ends the current block					        ;;
-	    (while (null line-begin-block)									        ;;
-	      (forward-line -1)		; go to the previous line						        ;;
-	      (if (bobp)
-		  (setq line-begin-block 1))
-	      (if (looking-at "^[ \t]*\\(IF\\|WHILE\\|BEGIN\\|LOOP\\)" )									        ;;
-		  (progn											        ;;
-		    ;;  this is the line that opens a block
-		    ;;  indentation of the BEGIN block line							        ;;
-		    (setq current-line-indent-step (current-indentation) )					        ;;
-		    ; go to the very next line (the one that needs to be indented)
-		    (forward-line 1)
-		    (setq line-begin-block (1+ (count-lines 1 (point) ) ) )					        ;;
-		    ;;  compute how much the following lines have to be indented				        ;;
-		    (setq current-line-indent-step (+ current-line-indent-step dataflex-mode-indent-step))	        ;;
-														        ;;
-		    )))												        ;;
-							
+(defvar dataflex-mode-indent-step-labels 2
+  "The number of spaces for each indent level for labels" )
+
+;;  A function to indent a whole buffer or the active region.
+(defun dataflex-indent-region-or-buffer ()
+"This function indents the whole buffer or, in the case a region is active, the active region."
+  (interactive)
+  
+  (let ( (current-block-end-line 0 ) (current-block-start-line 0) (current-indentation-step 0) (next-line-indentation-step 0) ) 
+    (progn
 
 
-	    (while (< line-begin-block line-end-block)								        ;;
-	      (progn												        ;;
-		(setq line-begin-block (1+ line-begin-block) )
-		(indent-line-to current-line-indent-step) 
-		(forward-line 1) ) ) 
+      ;;  if using a region indent only such region, otherwise the whole buffer
+      (if (use-region-p)
+	  ;;  using a region...
+	  (setq current-block-start-line (line-number-at-pos (region-beginning) )
+		current-block-end-line   (line-number-at-pos (region-end) ) )
+	;;  ...else use the whole buffer
+	(setq current-block-start-line (line-number-at-pos (point-min) )
+	      current-block-end-line   (line-number-at-pos (point-max) ) ) )
+							     
+      
 
-))))
+      ;;  go to the starting line
+      (goto-line current-block-start-line)
+
+      ;;  go to the beginning of the line
+      (beginning-of-line)
+
+    (while (<= current-block-start-line current-block-end-line )
+      (if (looking-at "^[ \t]*\\(IF\\|WHILE\\|BEGIN\\|LOOP\\)") 
+	  ;; the BEGIN line has to be indented at the current level, and the next
+	  ;;  line at a deeper level
+	  (setq next-line-indentation-step (+ current-indentation-step dataflex-mode-indent-step) )
+	;;   else if looking at an END line remove the indentation
+	(if (looking-at "^[ \t]*\\(END\\|RETURN\\|ABORT\\)") 
+	    (progn
+	      (setq current-indentation-step (- current-indentation-step dataflex-mode-indent-step) )
+	      (setq next-line-indentation-step current-indentation-step ) )
+	  ;;  else if this is a label line reset the indentation
+	  (if (looking-at  "^[ \t]*\\(.+\\):[ \t\n]*")
+	      (setq current-indentation-step 0 next-line-indentation-step dataflex-mode-indent-step-labels) ) ) )
+	    
+
+      ;;  security check: do not indent at negative offset
+      (if (< current-indentation-step 0 )
+	  (setq current-indentation-step 0) )
+      (if (< next-line-indentation-step 0 )
+	  (setq next-line-indentation-step 0 ) )
+
+      ;;  do the indent of the current line and go forward
+      (indent-line-to current-indentation-step)
+      (setq current-indentation-step next-line-indentation-step)
+      (setq current-block-start-line (1+ current-block-start-line))
+      (forward-line 1) ) ) ) )
+	  
+	    
+
+      
+
+;;  A function to indent a block of lines of the specified amount of spaces.
+(defun dataflex-indent-lines ( line-begin-block line-end-block current-indent-step  ) 
+  "Performs an indentation of the specified buffer lines with the specified amount of space.
+If doing a recursive indentation also indent the last line of the block.
+
+Arguments are:
+
+line-begin-block
+is the first line to start indentation from
+
+line-end-block
+is the last line to end indentation
+
+current-indent-step
+is the number of spaces to indent each line
+
+"
+  (interactive "nFrom line: \nnTo line: \nnHow much indentation: ")
+
+  (save-excursion
+    ;;  check arguments:
+    ;;  the line-begin-block must be at least 0 (first line of the buffer)
+    ;;  and the line-end-block must be greater than the line-begin-block.
+    ;;  Moreover, the indentation step must be greater than zero, or it is
+    ;;  set to the default value.
+    (if (< line-begin-block 0 )
+	(setq line-begin-block 0)
+      (if (< line-end-block line-begin-block)
+	  (setq line-end-block line-begin-block ) ) )
+
+    (if (< current-indent-step 0 )
+	(setq current-indent-step dataflex-mode-indent-step ))
+
+    ;;  start from the first line
+    (goto-line line-begin-block)
+    
+    ;;  loop thru the lines to indent each line
+    (while (<= line-begin-block line-end-block)								        ;;
+      (progn												        ;;
+	(setq line-begin-block (1+ line-begin-block) )
+	(indent-line-to current-indent-step) 
+	(forward-line 1) ) ) ) )
+  
 
 
 
