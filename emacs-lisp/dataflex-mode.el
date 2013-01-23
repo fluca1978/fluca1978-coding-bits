@@ -19,7 +19,8 @@
   (let ( (df-map (make-keymap) ) )
     (define-key df-map "\C-j"         'newline-and-indent)
     (define-key df-map "\C-c\C-t"     'df-transpose-single-line-move)
-    (define-key df-map "\C-C\C-i"     'dataflex-indent-region-or-buffer )
+    (define-key df-map "\C-c\C-i"     'dataflex-indent-region-or-buffer )
+    (define-key df-map "\C-c\C-j"     'dataflex-jump-to-label )
     df-map )
   "Keyboard map for the Dataflex Mode" )
 
@@ -218,6 +219,47 @@ is the number of spaces to indent each line
 	(indent-line-to current-indent-step) 
 	(forward-line 1) ) ) ) )
   
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defun dataflex-jump-to-label ( label-to-jump-to )
+  "A function to jump to a specific label (e.g., LABEL:). The function asks the user
+to specify the label to jump to or, in the case the user does not specify it, jumps to
+the current word label (if any)."
+  (interactive "sLabel to jump (within the buffer): ")
+  (progn
+    (if (<= (length label-to-jump-to) 0)
+	(setq label-to-jump-to (thing-at-point 'symbol) ) )
+      
+    (if (or (null label-to-jump-to) (<= (length label-to-jump-to) 0) )
+	(message "No label specified!")
+      ;;  else search the label
+      
+      (let ( ( label-regexp (concat "^[ \t]*" label-to-jump-to ":") ) 
+	     (label-line 0) 
+	     (label-window nil) )
+	;;  go to the beginning of the buffer
+	(beginning-of-buffer)
+	;;  search the label forward
+	(if (re-search-forward label-regexp)
+	    (progn
+	      ;;  the label has been found
+	      (setq label-line (line-number-at-pos (point) ) )
+	      (message (format "Label found at line %d" label-line ) )
+	      ;;  open a window and jump to the specified label
+	      (setq label-window (split-window-below) )
+	      (select-window label-window)
+	      (goto-line  label-line)  )
+	  (message (format "Cannot find the label [%s] (searched with [%s]) in this buffer!" label-to-jump-to label-regexp) ) ) ) ) ) )
+    
+
 
 
 
