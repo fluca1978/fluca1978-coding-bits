@@ -18,7 +18,7 @@
 (defvar dataflex-mode-map
   (let ( (df-map (make-keymap) ) )
     (define-key df-map "\C-j"         'newline-and-indent)
-    (define-key df-map "\C-c\C-t"     'df-transpose-single-line-move)
+    (define-key df-map "\C-c\C-t"     'dataflex-transpose-single-line-or-region)
     (define-key df-map "\C-c\C-i"     'dataflex-indent-region-or-buffer )
     (define-key df-map "\C-c\C-j"     'dataflex-jump-to-label )
     df-map )
@@ -41,16 +41,23 @@
 ;;  Define a constant for the main syntax hightlighting.
 (defconst dataflex-font-lock-keywords-minimal
   (list
-   '("\\<\\(BEGIN\\|E\\(?:LSE\\|ND\\)\\|FOR\\|IF\\|LOOP\\|MOVE\\|||T\\(?:HEN\\|O\\)\\|WHILE\\)\\>" . font-lock-builtin-face )
+   '("\\<\\(BEGIN\\|E\\(?:LSE\\|ND\\)\\|FOR\\|IF\\|LOOP\\|MOVE\\|TO\\|WHILE\\)\\>" . font-lock-constant-face )
    '("\\('\\w*'\\)" . font-lock-variable-name-face) )
   "Main (and minimal) highlighting for the Dataflex mode keywords" )
 
-(defconst dataflex-font-lock-keywords-main
+(defconst dataflex-font-lock-keywords-builtin
   (append dataflex-font-lock-keywords-minimal 
 	  (list
-	   '("\\<\\(NAME\\|OPEN\\|SAVERECORD\\UNLOCK\\|CLOSE\\|GOTO\\|RETURN\\)\\>" . font-lock-constant-face ) ) )
+	   '("\\<\\(NAME\\|OPEN\\|SAVERECORD\\UNLOCK\\|CLOSE\\|GOTO\\|RETURN\\)\\>" . font-lock-builtin-face ) ) )
   "Full keyword list" )
 	   
+
+(defconst dataflex-font-lock-keywords-main
+  (append dataflex-font-lock-keywords-builtin
+	  (list
+	   '("/\\(\\w+\\)[ \t\n]+/\*[ \t\n]" . font-lock-doc-face) ) )
+  "Mask(s) font locking" )
+
 
 ;;  Now define the whole highlights.
 ;;
@@ -61,6 +68,7 @@
 (defvar dataflex-mode-syntax-table
   (let ( (df-syn-table (make-syntax-table)) )
     (modify-syntax-entry ?_ "w" df-syn-table)           ; two words with a single _ are seen as one	        ;;
+    (modify-syntax-entry ?. "w" df-syn-table)           ; two words with a single . are seen as one	        ;;
     (modify-syntax-entry ?/ ". 12b" df-syn-table)      ; c++-like comment with //			        ;;
     (modify-syntax-entry ?\n "> b" df-syn-table)	; end of c++-like comment by newline		        ;;
     df-syn-table )
@@ -92,24 +100,52 @@ It is based on comment-dwin of newcomment.el"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defun df-transpose-single-line-move ()
-  "Transposes a MOVE A TO B instruction into a MOVE B TO A one"
+(defun dataflex-transpose-single-line-or-region ()
+  "A function to transpose instruction(s) in the form of
+
+         MOVE A TO B
+  
+   into something like
+
+        MOVE B TO A
+
+  This function can work on a single line or a whole region. Each line must be a
+  complete MOVE A TO B command, or the line will be skipped. "
   (interactive)
-    (progn
-      (beginning-of-line)	       ; go to the begin of the line
-      (forward-word)		       ; skip after MOVE
-      (forward-word)		       ; skip after A
-      (forward-word)		       ; skip after TO
-      (transpose-words 1)		; transpose TO and B
-      (backward-word)			
-      (backward-word)			; move at A
-      (transpose-words 1)		; transpose B and A
-      (transpose-words 1)		; transpose A and TO
-      (end-of-line)
-      (forward-line 1)			; go to the next line
-      ) ) 
 
+  (let ( (current-start-line (line-number-at-pos (point) ) ) (current-end-line (line-number-at-pos (point) ) ) )
+    (if (use-region-p)
+	;;  using a region...
+	(setq current-start-line (line-number-at-pos (region-beginning) )
+	      current-end-line   (line-number-at-pos (region-end) ) ) )
 
+    ;;  iterate over each line and transpose if needed
+    (while (<= current-start-line current-end-line )
+      (progn
+	(goto-line current-start-line)
+	(beginning-of-line)
+	(if (looking-at "^[ \t]*\\(MOVE\\)[ \t]+\\(.+\\)[ \t]+\\(TO\\)[ \t]+\\(.+\\)$")
+	    (progn
+	      (beginning-of-line)	       ; go to the begin of the line
+	      (forward-word)		       ; skip after MOVE
+	      (forward-word)		       ; skip after A
+	      (forward-word)		       ; skip after TO
+	      (transpose-words 1)		; transpose TO and B
+	      (backward-word)			
+	      (backward-word)			; move at A
+	      (transpose-words 1)		; transpose B and A
+	      (transpose-words 1)		; transpose A and TO
+	      (end-of-line) )
+	  ;;  else...cannot do a transpose
+	  (message "Not a (complete) MOVE instruction: it must be in the form MOVE A TO B") )
+	
+	;;  advance one line
+	(setq current-start-line (1+ current-start-line) )
+	(forward-line 1) ) ) ) )
+    
+    
+      
+      
 
 
 ;;  This variable defines the indent space size.
