@@ -77,7 +77,7 @@
 (defconst dataflex-font-lock-keywords-builtin
   (append dataflex-font-lock-keywords-minimal 
 	  (list
-	   '("\\<\\(NAME\\|OPEN\\|SAVERECORD\\UNLOCK\\|CLOSE\\|GOTO\\|RETURN\\)\\>" . font-lock-builtin-face ) ) )
+	   '("\\<\\(NAME\\|OPEN\\|SAVERECORD\\UNLOCK\\|CLOSE\\|GOTO\\|RETURN\\|INCLUDE\\)\\>" . font-lock-builtin-face ) ) )
   "Full keyword list" )
 	   
 ;;  Append the mask specific font-locks. 
