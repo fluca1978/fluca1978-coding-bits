@@ -1,3 +1,32 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;  DATAFLEX MODE
+;;  An Emacs Major Mode for developing Dataflex Based applications.
+;;  
+;;  Author: Luca Ferrari fluca1978 (at) gmail (dot) com
+;;  
+;;  This mode provides a set of font-locking and utility functions to ease the development of
+;;  dataflex source code files (usually .frm and .mac). The mode installs its own keymap
+;;  so that the following commands are available:
+;;  
+;;  C-j => usual new line and indent Emacs feature
+;;  C-c C-t => transposes a single line or a whole region so that assignments are reverted. In
+;;  other words a MOVE A TO B becomes MOVE B TO A.
+;;  C-c C-i => indent the current region or the whole buffer
+;;  C-c C-j => jump to a label within the same buffer: splits the window if the label
+;;  is not visible and sets the cursor at such label.
+;;  
+;;  In order to load automatically this mode for Dataflex source files add the following
+;;  lines to your .emacs configuration file:
+;;  
+;;  (add-to-list 'load-path "~/.emacs.d/" )
+;;  (require 'dataflex-mode)		
+;;   
+;;  assuming, of course, you have installed the file into your $HOME/.emacs.d
+;;  directory.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
@@ -41,7 +70,7 @@
 ;;  Define a constant for the main syntax hightlighting.
 (defconst dataflex-font-lock-keywords-minimal
   (list
-   '("\\<\\(BEGIN\\|E\\(?:LSE\\|ND\\)\\|FOR\\|IF\\|LOOP\\|MOVE\\|TO\\|WHILE\\)\\>" . font-lock-constant-face )
+   '("\\<\\(BEGIN\\|E\\(?:LSE\\|ND\\)\\|FOR\\|IF\\|LOOP\\|MOVE\\|TO\\|WHILE\\|NOT\\)\\>" . font-lock-constant-face )
    '("\\('\\w*'\\)" . font-lock-variable-name-face) )
   "Main (and minimal) highlighting for the Dataflex mode keywords" )
 
@@ -51,11 +80,14 @@
 	   '("\\<\\(NAME\\|OPEN\\|SAVERECORD\\UNLOCK\\|CLOSE\\|GOTO\\|RETURN\\)\\>" . font-lock-builtin-face ) ) )
   "Full keyword list" )
 	   
-
+;;  Append the mask specific font-locks. 
 (defconst dataflex-font-lock-keywords-main
   (append dataflex-font-lock-keywords-builtin
 	  (list
-	   '("/\\(\\w+\\)[ \t\n]+/\*[ \t\n]" . font-lock-doc-face) ) )
+	   '("[^a-zA-Z0-9 \t][_\\.]+[^a-zA-Z0-9 \t]" . font-lock-doc-face) 
+	   '("^/\\*[ \t]*$" . font-lock-warning-face)
+	   '("[ \t]*\[[ \t]*\\w+[ \t]*\\w*[ \t]*\]" . font-lock-warning-face)
+	   '("^/\\w+[ \t]*$" . font-lock-warning-face) ) )
   "Mask(s) font locking" )
 
 
