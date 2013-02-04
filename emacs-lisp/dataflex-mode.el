@@ -110,19 +110,6 @@
 
 
 
-;;  A function to wrap comment-dwin so that it is possible to comment in/out a whole region.
-;;  This function will use 'newcomment and use the // as a comment begin mark and nothing as
-;;  a comment end.
-(defun dataflex-comment-dwim (arg)
-  "Comment (in/out) a Dataflex piece of source code. 
-It is based on comment-dwin of newcomment.el"
-  (interactive "*P")
-  (require 'newcomment)
-  (let ( (comment-start "// * ") (comment-end " *** ") (comment-style 'box) )
-    (comment-dwim arg)))
-
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -361,6 +348,10 @@ the current word label (if any)."
   ;;  (the third argument makes the font-locking case insensitive so that both uppercase and
   ;;  lower case keywords are emphasized)
   (set (make-local-variable 'font-lock-defaults) '(dataflex-font-lock-keywords nil t) )
+
+  ;;  comments
+  (set (make-local-variable 'comment-start) "//")
+  (set (make-local-variable 'comment-start-skip) "//+\\s-*")
 
   ;;  set the mode info
   (setq major-mode 'dataflex-mode)
