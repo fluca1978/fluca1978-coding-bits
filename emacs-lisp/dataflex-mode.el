@@ -179,28 +179,28 @@
 "This function indents the whole buffer or, in the case a region is active, the active region."
   (interactive)
   
-  (let ( (current-block-end-line 0 ) (current-block-start-line 0) (current-indentation-step 0) (next-line-indentation-step 0) ) 
+  (let ( (current-block-end-pos 0 ) (current-block-start-pos 0) (current-indentation-step 0) (next-line-indentation-step 0) ) 
     (progn
 
 
       ;;  if using a region indent only such region, otherwise the whole buffer
       (if (use-region-p)
 	  ;;  using a region...
-	  (setq current-block-start-line (line-number-at-pos (region-beginning) )
-		current-block-end-line   (line-number-at-pos (region-end) ) )
+	  (setq current-block-start-pos (region-beginning) 
+		current-block-end-pos   (region-end) )
 	;;  ...else use the whole buffer
-	(setq current-block-start-line (line-number-at-pos (point-min) )
-	      current-block-end-line   (line-number-at-pos (point-max) ) ) )
-							     
+	  (setq current-block-start-pos (point-min) 
+		current-block-end-pos   (point-max) ) )
       
+	  
 
       ;;  go to the starting line
-      (goto-line current-block-start-line)
+      (goto-char current-block-start-pos)
 
       ;;  go to the beginning of the line
       (beginning-of-line)
 
-    (while (<= current-block-start-line current-block-end-line )
+    (while (<= current-block-start-pos current-block-end-pos )
       (if (looking-at "^[ \t]*\\(IF\\|WHILE\\|BEGIN\\|LOOP\\)") 
 	  ;; the BEGIN line has to be indented at the current level, and the next
 	  ;;  line at a deeper level
@@ -224,8 +224,8 @@
       ;;  do the indent of the current line and go forward
       (indent-line-to current-indentation-step)
       (setq current-indentation-step next-line-indentation-step)
-      (setq current-block-start-line (1+ current-block-start-line))
-      (forward-line 1) ) ) ) )
+      (forward-line 1)
+      (setq current-block-start-pos (point) ) ) ) ) )
 	  
 	    
 
