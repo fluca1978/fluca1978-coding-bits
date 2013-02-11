@@ -25,7 +25,7 @@ then											        #
 fi											        #
 
 # effettuo il mount
-su - luca -c "$sharity_cmd mount smb://$win_server/$win_share $win_mount"
+$sharity_cmd mount smb://$win_server/$win_share $win_mount
 if test $? -eq 0
 then
     echo "=== Cartella collegata con successo e disponibile in $win_mount! ==="
