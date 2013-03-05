@@ -1,6 +1,7 @@
 #include <panicModuleSyscalls.h>    /* syscall declaration and arguments */
 #include <panicModule.h>            /* initialization module variable */
 
+
 #ifdef _MALLOC_ARGS_
 #include <sys/param.h>
 #include <sys/malloc.h>
@@ -94,9 +95,11 @@ int panicable_mkdir( struct thread *thread,
   /* should we call the standard mkdir or panic? */
   if( ! shouldPanic ){
     /* ok, do a regular call */
-    return mkdir( thread, uap );
+    return sys_mkdir( thread, uap );
   }
   else{
+    /*  be polite, and sync dirty buffers  */
+    sys_sync( thread, NULL );
     panic( "Generating a panic from mkdir system call!" );
     return shouldPanic; /* should never get here, just to keep quite the compiler */
   }
@@ -158,9 +161,11 @@ int panicable_open(  struct thread    *thread,
   /* should we call the standard open or panic? */
   if( ! shouldPanic ){
     /* ok, do a regular call */
-    return open( thread, uap );
+    return sys_open( thread, uap );
   }
   else{
+    /*  be polite, and sync dirty buffers  */
+    sys_sync( thread, NULL );
     panic( "Generating a panic from open system call!" );
     return shouldPanic; /* should never get here, just to keep quite the compiler */
   }

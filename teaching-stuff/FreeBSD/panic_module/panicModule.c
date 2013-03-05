@@ -45,86 +45,13 @@ static panic_module_argv_t _argv = {
 
 
 /**
- * Arguments that initialized the module.
+ * Arguments that initialize the module.
  * By default the module has no arguments.
  * This variable will be used to handle the initialization
  * of the module so that it can be passed around from the 
  * module to another function.
  */
 panic_module_argv_t* moduleInitializationData = NULL;
-
-
-
-
-/**
- * Define the panicable mkdir system call.
- * The struct contains the number of arguments used for the system call
- * (i.e., size of arguments over the size of the registers = number
- * of the registers) as well as the method to call to execute the 
- * system call. The structure contains also some other initialization stuff
- * that is copied by sys/init_sysent.c
- */
-static struct sysent panicable_mkdir_sysent_definition = {
-  (sizeof(struct mkdir_args) / sizeof(register_t)), /* same AS(name) from init_sysent.c */
-  (sy_call_t *) panicable_mkdir,
-  AUE_MKDIR, 
-  NULL, 
-  0, 
-  0, 
-  0
-};
-
-/**
- * A struct used to keep the data of the original mkdir system call,
- * so that is is possible to switch back to the original system call
- * once the module is unloaded.
- */
-static struct sysent clean_mkdir_sysent_definition = {
-  (sizeof(struct mkdir_args) / sizeof(register_t)), /* same AS(name) from init_sysent.c */
-  NULL,
-  AUE_MKDIR, 
-  NULL, 
-  0, 
-  0, 
-  0
-};
-
-
-
-
-/**
- * Define the panicable open system call.
- * The struct contains the number of arguments used for the system call
- * (i.e., size of arguments over the size of the registers = number
- * of the registers) as well as the method to call to execute the 
- * system call. The structure contains also some other initialization stuff
- * that is copied by sys/init_sysent.c
- */
-struct sysent panicable_open_sysent_definition = {
-  (sizeof(struct open_args) / sizeof(register_t)), /* same AS(name) from init_sysent.c */
-  (sy_call_t *) panicable_open,
-  AUE_OPEN_RWTC, 
-  NULL, 
-  0, 
-  0, 
-  0
-};
-
-/**
- * A struct used to keep the data of the original open system call,
- * so that is is possible to switch back to the original system call
- * once the module is unloaded.
- */
-struct sysent clean_open_sysent_definition = {
-  (sizeof(struct open_args) / sizeof(register_t)), /* same AS(name) from init_sysent.c */
-  NULL,
-  AUE_OPEN_RWTC, 
-  NULL, 
-  0, 
-  0, 
-  0
-};
-
 
 
 /*---------------------------------------------------------------------------------*/
@@ -164,6 +91,13 @@ panicEventHandler(
   /* Define a variable to handle the exit status (0 on success) */
   int error = 0;  
 
+  /*  
+   *  Define clean (unmodified) system call handlers. These will be used
+   *  to revert the original system calls when the module is unloaded.
+   */
+  sy_call_t *clean_mkdir_system_call = sysent[ SYS_mkdir ].sy_call;;
+  sy_call_t *clean_open_system_call  = sysent[ SYS_open  ].sy_call;;
+
   /* which kind of event is happening for this module? */
   switch( event ){	
 
@@ -189,11 +123,9 @@ panicEventHandler(
 
     /* insert the panicable system calls in the system table */
     uprintf( "\nInstalling a panicable mkdir system call...\n" );
-    clean_mkdir_sysent_definition = sysent[ SYS_mkdir ];
-    sysent[ SYS_mkdir ]           = panicable_mkdir_sysent_definition;
+    sysent[ SYS_mkdir ].sy_call   = (sy_call_t *) panicable_mkdir;
     uprintf( "\nInstalling a panicable open system call...\n" );
-    clean_open_sysent_definition  = sysent[ SYS_open ];
-    sysent[ SYS_open ]            = panicable_open_sysent_definition;
+    sysent[ SYS_open ].sy_call    = (sy_call_t *) panicable_open;
 
 
     break;
@@ -206,8 +138,8 @@ panicEventHandler(
     
     /* restore the original system call */
     uprintf( "\nRestoring the original system calls...\n" );
-    sysent[ SYS_mkdir ] = clean_mkdir_sysent_definition;
-    sysent[ SYS_open ]  = clean_open_sysent_definition;
+    sysent[ SYS_mkdir ].sy_call = clean_mkdir_system_call;
+    sysent[ SYS_open  ].sy_call = clean_open_system_call;
 
     break;
     
