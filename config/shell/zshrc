@@ -1,0 +1,60 @@
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.histfile
+HISTSIZE=1000
+SAVEHIST=1000
+bindkey -e
+# End of lines configured by zsh-newuser-install
+
+########[ DIRECTORY OPTIONS ]####################
+# Changing directory options: change to directory
+# automatically when specified even without the
+# 'cd' command.
+setopt AUTO_CD
+
+# If a path is specified to an implicit or explicit
+# 'cd' command and the path is not found, treat it
+# as it was preceeded by ~
+setopt CDABLE_VARS
+
+# Remove dots from a path if they don't chnage
+# the behaviour (eg., cd foo/./tmp => foo/tmp)
+setopt CHASE_DOTS
+
+#################################################
+########[ COMPLETION OPTIONS ]###################
+
+# List choices on ambiguos completions
+setopt AUTO_LIST
+
+# Use menu' for completion of the second request
+# of a completion (TAB pressed twice)
+setopt AUTO_MENU
+
+# Always insert the first completion, and then on the
+# second request, cycle thru menu options.
+setopt MENU_COMPLETE
+
+# Produce a list of completion when a word has a
+# glob pattern, instead of expanding the glob
+# to all possible expansions.
+setopt GLOB_COMPLETE
+
+#################################################
+########[ COMMAND OPTIONS ]######################
+
+# Avoid accidental file deletion with '>' and '>>'
+# and use '>|' and '>>|' to force the content
+# deletion
+unsetopt CLOBBER
+
+# Try to correct mispelled commands
+setopt CORRECT
+
+#################################################
+
+# Load colors definitions so that variabiles can be used
+# instead of numeric escape sequences.
+autoload -U colors && colors
+
+PROMPT="%{$fg_bold[yellow]%}[%{$reset_color%}%{$fg_bold[blue]%}%n%{$reset_color%}%{$fg[yellow]%}@%{$reset_color%}%{$fg_bold[white]%}%m%{$reset_color%}%{$fg_bold[yellow]%}]%{$reset_color%}%{$fg_bold[red]%}%%%{$reset_color%} "
+RPROMPT="%{$reset_color%}%{$fg_bold[magenta]%}%~%{$reset_color%}"
