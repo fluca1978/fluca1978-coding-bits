@@ -1,0 +1,53 @@
+
+* Main IRC Commands
+** Commands on myself
+*** /me
+    The ~/me~ command prints out a status message related to my nickname.
+    As an example:
+    #+begin_example
+    /me I'm waiting for an idea
+    #+end_example
+    The phrase is displayed on the other participants screen and is not directed
+    to anybody in particular.
+*** /nick
+    The ~/nick~ command is used to change the nickname I'm currently connected
+    to a channel. For example:
+    #+begin_example
+    /nick fluca1978
+    #+end_example
+    makes my connection known as /fluca1978/.
+
+** Commands against another user
+*** /msg
+    The ~/msg~ command starts a private chat message to another user specified
+    by its nickname, as for instance:
+    #+begin_example
+    /msg fluca1978 Hi fluca!
+    #+end_example
+    that sends the "Hi fluca!" message to the /fluca1978/ user. The ~/msg~ command
+    starts a private chat with the target user.
+
+*** /notice
+    The ~/notice~ command sends a private message to another user, privately, without
+    starting a new private chat (i.e., without opening a private chat window), as for
+    instance:
+    #+begin_example
+    /notice fluca1978 Hi fluca!
+    #+end_example
+
+*** /query
+    The ~/query~ command starts a private chat, in a similar way to ~/msg~ but
+    forcing a new window to popup. As an example:
+    #+begin_example
+    /query fluca1978 Hi fluca!
+    #+end_example
+
+** Commands on the channel/connection
+*** /join
+    The ~/join~ allows the connection to another channel, as for instance:
+    #+begin_example
+    /join #postgresql-it
+    #+end_example
+
+*** /part
+    The ~/part~ command causes myself to leave the channel.
