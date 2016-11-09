@@ -20,10 +20,9 @@ my @wrong_chars      = ();
 ReadMode 3; # allow for signals
 
 # while there are undiscovered chars or other trials to do, go for it!
-while( grep( /[+_]/,  values %guess_status ) &&  $max_trials > 0 ){
+$current_guessing = join ' ' , map { $guess_status{ $_ } } ( split // , $word );
+while( $current_guessing =~ /[+_]/ &&  $max_trials > 0 ){
 
-    # build the guessing line
-    $current_guessing = join ' ' , map { $guess_status{ $_ } } ( split // , $word );
 
     say "\n\n|| $current_guessing ||\t" . join( ',', @wrong_chars );
     say "guess a char: ";
@@ -39,6 +38,8 @@ while( grep( /[+_]/,  values %guess_status ) &&  $max_trials > 0 ){
     else{
         say "You guessed right [$current_char]!";
         $guess_status{ $current_char } = $current_char;
+        # build the guessing line
+        $current_guessing = join ' ' , map { $guess_status{ $_ } } ( split // , $word );
     }
 
 
