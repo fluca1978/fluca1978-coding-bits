@@ -8,5 +8,5 @@ $/ = \1; # set one char at time (input record separator)
 $| = 1;  # force autoflush
 while ( <$fh> ){
     print;
-    usleep( ( /[a-zA-Z]/ ? 1 : 2  ) * 75000  );
+    usleep( ( /[a-zA-Z]/ ? 1 : ( /[.!?\n]/ ? 10 : 2 )  ) * 75000  );
 }
