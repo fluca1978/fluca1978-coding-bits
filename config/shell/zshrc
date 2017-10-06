@@ -50,11 +50,40 @@ unsetopt CLOBBER
 # Try to correct mispelled commands
 setopt CORRECT
 
+autoload -U zmv
+
+
 #################################################
 
 # Load colors definitions so that variabiles can be used
 # instead of numeric escape sequences.
 autoload -U colors && colors
 
-PROMPT="%{$fg_bold[yellow]%}[%{$reset_color%}%{$fg_bold[blue]%}%n%{$reset_color%}%{$fg[yellow]%}@%{$reset_color%}%{$fg_bold[white]%}%m%{$reset_color%}%{$fg_bold[yellow]%}]%{$reset_color%}%{$fg_bold[red]%}%%%{$reset_color%} "
-RPROMPT="%{$reset_color%}%{$fg_bold[magenta]%}%~%{$reset_color%}"
+PROMPT="
+{ %{$reset_color%}%{$fg_bold[magenta]%}%~%{$reset_color%} }
+%{$fg_bold[yellow]%}[%{$reset_color%}%{$fg_bold[blue]%}%n%{$reset_color%}%{$fg[yellow]%}@%{$reset_color%}%{$fg_bold[white]%}%m%{$reset_color%} %{$fg_bold[green]%}%*%{$reset_color%}%{$fg_bold[yellow]%}]%{$reset_color%}
+%{$fg_bold[red]%}%%%{$reset_color%} "
+#RPROMPT="%{$reset_color%}%{$fg_bold[magenta]%}%~%{$reset_color%}"
+
+
+export PATH=$HOME/bin:$PATH:/usr/local/emacs24.3/bin
+. $HOME/bin/java.env
+
+alias sync-edilweb-lnx067t="rsync -av /sviluppo/php/edilweb/edilweb/ lferrar3@lnx067t:/dati/edilweb/ --exclude=misc --exclude=edilweb.org --exclude=config-type.inc.php --exclude=allegati --exclude=t --exclude='db' --exclude=Smarty --exclude='*smarty*'"
+#alias sync-edilweb-lnx032t="rsync -av /sviluppo/php/edilweb/edilweb/ lferrar3@lnx032t:/dati/edilweb/ --exclude=misc --exclude=edilweb.org --exclude=config-type.inc.php --exclude=allegati --exclude=t --exclude='*.db' --exclude='Smarty' --exclude='*smarty*'"
+alias sync-edilweb-test="sync-edilweb-lnx067t"
+
+alias lynx2000_tar_edilweb="tar cjvf ~/tmp/edilweb_`date +'%d_%m_%Y'`.tar.bz2 /sviluppo/php/edilweb/edilweb --exclude=lib --exclude=css --exclude=allegati --exclude=misc --exclude=t --exclude=Smarty --exclude=smarty_templates"
+
+
+#PERL_MB_OPT="--install_base \"/home/luca/perl5\""; export PERL_MB_OPT;
+#PERL_MM_OPT="INSTALL_BASE=/home/luca/perl5"; export PERL_MM_OPT;
+
+source ~/perl5/perlbrew/etc/bashrc
+export PATH=~/.rakudobrew/bin:$PATH
+eval "$(/home/luca/.rakudobrew/bin/rakudobrew init -)"
+
+#RAKUDO_STAR_PATH=/home/luca/tmp/rakudo-star-2016.07/install
+#PERL6_EXEC_PATH=${RAKUDO_STAR_PATH}/bin
+#PERL6_SITE_BIN_PATH=${RAKUDO_STAR_PATH}/share/perl6/site/bin
+#export PATH=$PERL6_EXEC_PATH:$PERL6_SITE_BIN_PATH:$PATH
