@@ -5,17 +5,13 @@ sub MAIN( Str :$backup_dir
     , *@backup_entries where { .map: { .IO.f || .IO.d // die "No backup entry [$_]" }  }
     )
 {
-    my $now = DateTime.now;
+    my $now = DateTime.now( formatter => { '%04d-%02d-%02dT%02d-%02d'.sprintf: .year, .month, .day, .hour, .minute; } );
     # for each entry compute the name
     for @backup_entries -> $entry {
-        my $archive_name = $backup_dir.IO.add: '%s-%s-%04d-%02d-%02dT%02d%02d'.sprintf(
+        my $archive_name = $backup_dir.IO.add: '%s-%s-%s'.sprintf(
                                                      ( $entry.IO.d ?? 'DIRECTORY' !! 'FILE' ),
                                                      $entry.IO.basename,
-                                                     $now.year,
-                                                     $now.month,
-                                                     $now.day,
-                                                     $now.hour,
-                                                     $now.minute );
+                                                     $now );
 
         "== Backup %s\n\t  [%s]\n\t->[%s]".sprintf( ( $entry.IO.d ?? 'DIRECTORY' !! 'FILE' ), $entry.IO.basename, $archive_name ).say;
         if $entry.IO.d {
