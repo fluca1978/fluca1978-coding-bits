@@ -14,6 +14,7 @@ subtest 'NEW Version number parsing' => {
     isnt( $version.is-alfa, True, 'Alfa version' );
     isnt( $version.is-beta, True, 'Beta version' );
     is( $version.development-number, Nil, 'Extract beta number' );
+    is( $version.server-version-num, '100001', 'SHOW SERVER_VERSION_NUM' );
 
     my $version-string = '11beta3';
     $version.parse: 'v' ~ $version-string;
@@ -23,6 +24,7 @@ subtest 'NEW Version number parsing' => {
     isnt( $version.is-alfa, True, 'Alfa version' );
     is( $version.is-beta, True, 'Beta version' );
     is( $version.development-number, 3, 'Extract beta number' );
+    is( $version.server-version-num, '119999', 'SHOW SERVER_VERSION_NUM' );
 
     $version-string = '11alfa4';
     $version.parse: $version-string;
@@ -59,6 +61,7 @@ subtest 'OLD version number parsing' => {
     isnt( $version.is-alfa, True, 'Alfa old version' );
     isnt( $version.is-beta, True, 'Beta old version' );
     is( $version.development-number, Nil, 'Extract old beta number' );
+    is( $version.server-version-num, '090605', 'SHOW SERVER_VERSION_NUM' );
 
     $version-string = '6.12';
     $version.parse: $version-string;

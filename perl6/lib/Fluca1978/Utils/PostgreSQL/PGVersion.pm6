@@ -83,6 +83,19 @@ class PGVersion {
 
     }
 
+    # Method compatible with the PostgreSQL
+    # SHOW server_version
+    # SHOW server_version_num
+    method server-version { return self.gist; }
+    method server-version-num {
+        return '%02d%02d%02d'.sprintf:
+        $!first-number,
+        self!use-two-numbers ?? 0 !! $!second-number,
+        self!use-two-numbers ?? $!second-number !! $!third-number if ! self.is-alfa && ! self.is-beta;
+
+        return '%02d9999'.sprintf: $!first-number;
+    }
+
     # Construct the object by means of a version string.
     method BUILD( :$version-string! ){
         self.parse( $version-string );
