@@ -12,9 +12,9 @@
 # there are two integers to keep track of an alfa or beta number, if they
 # are greater than zero the version is an experimental one.
 class PGVersion {
-    has Int $!first-number   = 0;
-    has Int $!second-number  = 0;
-    has Int $!third-number   = 0;
+    has Int $!brand-number   = 0;
+    has Int $!year-number    = 0;
+    has Int $!minor-number   = 0;
     has Int $!alfa-number    = 0;
     has Int $!beta-number    = 0;
 
@@ -24,17 +24,17 @@ class PGVersion {
 
     # Utility method to know if the numbering scheme has
     # two only digits (i.e., 10 ongoing or less than 7 )
-    method !use-two-numbers { return $!first-number >= 10 || $!first-number < 7; }
+    method !use-two-numbers { $!brand-number >= 10 || $!brand-number < 7; }
 
     method major-number( --> Str ){
         self!use-two-numbers
-                ?? $!first-number.Str
-                !! '%d.%d'.sprintf( $!first-number, $!second-number );
+                ?? $!brand-number.Str
+                !! '%d.%d'.sprintf( $!brand-number, $!year-number );
     }
 
     method minor-number {
         return Nil if self.is-alfa || self.is-beta;
-        return self!use-two-numbers ?? $!second-number !! $!third-number;
+        return $!minor-number;
     }
 
     method development-number {
@@ -46,12 +46,12 @@ class PGVersion {
     # Provide s descriptive string with only the numeric part.
     method gist( --> Str ){
         if self!use-two-numbers {
-            return '%dalfa%d'.sprintf( $!first-number, $!alfa-number ) if self.is-alfa;
-            return '%dbeta%d'.sprintf( $!first-number, $!beta-number ) if self.is-beta;
-            return '%d.%d'.sprintf(    $!first-number, $!second-number );
+            return '%dalfa%d'.sprintf( $!brand-number, $!alfa-number ) if self.is-alfa;
+            return '%dbeta%d'.sprintf( $!brand-number, $!beta-number ) if self.is-beta;
+            return '%d.%d'.sprintf(    $!brand-number, $!minor-number );
         }
         else {
-            return '%d.%d.%d'.sprintf: $!first-number, $!second-number, $!third-number;
+            return '%d.%d.%d'.sprintf: $!brand-number, $!year-number, $!minor-number;
         }
     }
 
@@ -89,11 +89,9 @@ class PGVersion {
     method server-version { return self.gist; }
     method server-version-num {
         return '%02d%02d%02d'.sprintf:
-        $!first-number,
-        self!use-two-numbers ?? 0 !! $!second-number,
-        self!use-two-numbers ?? $!second-number !! $!third-number if ! self.is-alfa && ! self.is-beta;
-
-        return '%02d9999'.sprintf: $!first-number;
+        $!brand-number,
+        $!year-number,
+        $!minor-number;
     }
 
     # Construct the object by means of a version string.
@@ -114,9 +112,9 @@ class PGVersion {
 
         # reset all variabiles, allowing this object
         # to re-parse a different string
-        $!first-number   = 0;
-        $!second-number  = 0;
-        $!third-number   = 0;
+        $!brand-number   = 0;
+        $!year-number  = 0;
+        $!minor-number   = 0;
         $!alfa-number    = 0;
         $!beta-number    = 0;
 
@@ -127,9 +125,9 @@ class PGVersion {
                         $<second>=(\d ** 1..2 )
                         <[.]>
                         $<third>=(\d ** 1..2 )/ {
-            $!first-number  = $/<first>.Int;
-            $!second-number = $/<second>.Int;
-            $!third-number  = $/<third>.Int;
+            $!brand-number  = $/<first>.Int;
+            $!year-number = $/<second>.Int;
+            $!minor-number  = $/<third>.Int;
             return True;
         }
         elsif $string ~~ / <[vV]>?
@@ -137,16 +135,16 @@ class PGVersion {
                            <[.]>
                            $<second>=(\d ** 1..2 ) / {
             # stable new numbering v10.1
-            $!first-number  = $/<first>.Int;
-            $!second-number = $/<second>.Int;
+            $!brand-number  = $/<first>.Int;
+            $!minor-number  = $/<second>.Int;
             return True;
         }
         elsif $string ~~ / <[vV]>? $<first>=(\d ** 1..2 ) $<dev>=( < alfa | beta > ) $<dev-n>=( \d ) / {
             # unstable new numbering v11beta3
-            $!first-number  = $/<first>.Int;
+            $!brand-number  = $/<first>.Int;
             $!alfa-number = $/<dev> ~~ 'alfa' ?? $/<dev-n>.Int !! 0;
             $!beta-number = $/<dev> ~~ 'beta' ?? $/<dev-n>.Int !! 0;
-
+            $!year-number = $!minor-number = 99;
             return True;
         }
 
