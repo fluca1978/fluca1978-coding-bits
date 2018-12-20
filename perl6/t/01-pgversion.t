@@ -63,11 +63,20 @@ subtest 'OLD version number parsing' => {
     is( $version.development-number, Nil, 'Extract old beta number' );
     is( $version.server-version-num, '090605', 'SHOW SERVER_VERSION_NUM' );
 
-    $version-string = '6.12';
+    $version-string = '6.3.2';
     $version.parse: $version-string;
     is( $version.gist, $version-string, 'Stringify OLD version number' );
-    is( $version.major-number, '6', 'Get old version number' );
-    is( $version.minor-number, 12, 'Get old minor version number' );
+    is( $version.major-number, '6.3', 'Get old version number' );
+    is( $version.minor-number, 2, 'Get old minor version number' );
+    isnt( $version.is-alfa, True, 'Alfa old version' );
+    isnt( $version.is-beta, True, 'Beta old version' );
+    is( $version.development-number, Nil, 'Extract old beta number' );
+
+    $version-string = '1.1';
+    $version.parse: $version-string;
+    is( $version.gist, $version-string, 'Stringify OLD version number' );
+    is( $version.major-number, '1', 'Get old version number' );
+    is( $version.minor-number, 1, 'Get old minor version number' );
     isnt( $version.is-alfa, True, 'Alfa old version' );
     isnt( $version.is-beta, True, 'Beta old version' );
     is( $version.development-number, Nil, 'Extract old beta number' );

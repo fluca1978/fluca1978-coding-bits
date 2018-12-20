@@ -25,8 +25,8 @@ class PGVersion {
     method is-beta( --> Bool ){ return $!beta-number > 0; }
 
     # Utility method to know if the numbering scheme has
-    # two only digits (i.e., 10 ongoing or less than 7 )
-    method !use-two-numbers { $!brand-number >= 10 || $!brand-number < 7; }
+    # two only digits (i.e., 10 ongoing or less than 6 )
+    method !use-two-numbers { $!brand-number >= 10 || $!brand-number < 6; }
 
     method major-number( --> Str ){
         self!use-two-numbers
@@ -146,7 +146,7 @@ class PGVersion {
             $!brand-number  = $/<first>.Int;
             $!alfa-number = $/<dev> ~~ 'alfa' ?? $/<dev-n>.Int !! 0;
             $!beta-number = $/<dev> ~~ 'beta' ?? $/<dev-n>.Int !! 0;
-            $!year-number = $!minor-number = 99;
+            $!year-number = $!minor-number = 0;
             return True;
         }
 
@@ -168,7 +168,7 @@ class PGVersion {
 
     # Check if this version is the same of another version.
     method ACCEPTS ( PGVersion $other ){
-        self.gist ~~ $other.gist;
+        self.server-version-num == $other.server-version-num;
     }
 
     method newer( PGVersion $version ){
