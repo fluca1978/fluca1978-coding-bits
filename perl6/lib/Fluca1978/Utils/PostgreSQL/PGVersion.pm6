@@ -171,5 +171,12 @@ class PGVersion {
         self.gist ~~ $other.gist;
     }
 
+    method newer( PGVersion $version ){
+        self.server-version-num > $version.server-version-num;
+    }
+
+    method older( PGVersion $version ){
+        self.server-version-num < $version.server-version-num;
+    }
 
 }

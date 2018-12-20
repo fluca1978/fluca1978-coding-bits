@@ -90,4 +90,7 @@ subtest 'ACCEPTS and smart matching' => {
     is( $version-a ~~ $version-b, False, 'Smart matching against different version' );
     is( $version-a ~~ 'v10.1', True, 'Smart matching against self string' );
     is( $version-b.gist ~~ '9.6.5', True, 'Smart matching against self string' );
+
+    is( $version-a.newer( $version-b ), True, 'Newer version' );
+    is( $version-b.older( $version-a ), True, 'Older version' );
 }
