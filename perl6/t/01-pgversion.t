@@ -1,7 +1,7 @@
 use v6;
 use Test;
 use Fluca1978::Utils::PostgreSQL::PGVersion;
-plan 3;
+plan 5;
 
 use-ok( 'Fluca1978::Utils::PostgreSQL::PGVersion' );
 
@@ -24,7 +24,7 @@ subtest 'NEW Version number parsing' => {
     isnt( $version.is-alfa, True, 'Alfa version' );
     is( $version.is-beta, True, 'Beta version' );
     is( $version.development-number, 3, 'Extract beta number' );
-    is( $version.server-version-num, '119999', 'SHOW SERVER_VERSION_NUM' );
+    is( $version.server-version-num, '110000', 'SHOW SERVER_VERSION_NUM' );
 
     $version-string = '11alfa4';
     $version.parse: $version-string;

@@ -15,14 +15,14 @@ class PGVersion {
     has Int $!brand-number   = 0;
     has Int $!year-number    = 0;
     has Int $!minor-number   = 0;
-    has Int $!alfa-number    = 0;
-    has Int $!beta-number    = 0;
+
+    has Str $!type           = 'R';  # R = Release, A = Alfa, B = Beta
 
     has Str $!http-download;
 
 
-    method is-alfa( --> Bool ){ return $!alfa-number > 0; }
-    method is-beta( --> Bool ){ return $!beta-number > 0; }
+    method is-alfa( --> Bool ){ 'A' ~~ $!type; }
+    method is-beta( --> Bool ){ 'B' ~~ $!type; }
 
     # Utility method to know if the numbering scheme has
     # two only digits (i.e., 10 ongoing or less than 6 )
@@ -41,16 +41,16 @@ class PGVersion {
 
     method development-number {
         return Nil if ! self.is-alfa && ! self.is-beta;
-        return $!alfa-number if self.is-alfa;
-        return $!beta-number if self.is-beta;
+        return $!minor-number;
     }
 
     # Provide s descriptive string with only the numeric part.
     method gist( --> Str ){
         if self!use-two-numbers {
-            return '%dalfa%d'.sprintf( $!brand-number, $!alfa-number ) if self.is-alfa;
-            return '%dbeta%d'.sprintf( $!brand-number, $!beta-number ) if self.is-beta;
-            return '%d.%d'.sprintf(    $!brand-number, $!minor-number );
+            return '%d%s%d'.sprintf:
+            $!brand-number,
+            self.is-alfa ?? 'alfa' !! self.is-beta ?? 'beta' !! '.',
+            $!minor-number;
         }
         else {
             return '%d.%d.%d'.sprintf: $!brand-number, $!year-number, $!minor-number;
@@ -79,7 +79,7 @@ class PGVersion {
         return '%s (%s %d of development branch %d)'.sprintf:
         self.gist,
         self.is-alfa ?? 'alfa' !! 'beta',
-        self.is-alfa ?? $!alfa-number !! $!beta-number,
+        $!minor-number,
         self.major-number;
 
 
@@ -114,11 +114,10 @@ class PGVersion {
 
         # reset all variabiles, allowing this object
         # to re-parse a different string
-        $!brand-number   = 0;
+        $!brand-number = 0;
         $!year-number  = 0;
-        $!minor-number   = 0;
-        $!alfa-number    = 0;
-        $!beta-number    = 0;
+        $!minor-number = 0;
+        $!type         = 'R';
 
         # old-numbering: v9.6.5
         if $string ~~ / <[vV]>?
@@ -143,10 +142,10 @@ class PGVersion {
         }
         elsif $string ~~ / <[vV]>? $<first>=(\d ** 1..2 ) $<dev>=( < alfa | beta > ) $<dev-n>=( \d ) / {
             # unstable new numbering v11beta3
-            $!brand-number  = $/<first>.Int;
-            $!alfa-number = $/<dev> ~~ 'alfa' ?? $/<dev-n>.Int !! 0;
-            $!beta-number = $/<dev> ~~ 'beta' ?? $/<dev-n>.Int !! 0;
-            $!year-number = $!minor-number = 0;
+            $!brand-number = $/<first>.Int;
+            $!year-number  = 0;
+            $!minor-number = $/<dev-n>.Int || 0;
+            $!type = $/<dev> ~~ 'alfa' ?? 'A' !! 'B';
             return True;
         }
 
