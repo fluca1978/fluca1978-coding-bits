@@ -18,6 +18,8 @@ class PGVersion {
     has Int $!alfa-number    = 0;
     has Int $!beta-number    = 0;
 
+    has Str $!http-download;
+
 
     method is-alfa( --> Bool ){ return $!alfa-number > 0; }
     method is-beta( --> Bool ){ return $!beta-number > 0; }
@@ -151,4 +153,23 @@ class PGVersion {
         # unknown version string!
         return False;
     }
+
+    # Computes the available downloadable link
+    # from the official web site or the base specified.
+    #
+    #
+    method http-download-url( Str :$base = 'https://ftp.postgresql.org/pub/source' ){
+        return '%s/%s/postgresql-%s.tar.%s'.sprintf:
+        $base,
+        self.Str, # e.g., v11.1
+        self.gist, # e.g., 11.1
+        $!brand-number <= 7 ?? 'gz' !! 'bz2';
+    }
+
+    # Check if this version is the same of another version.
+    method ACCEPTS ( PGVersion $other ){
+        self.gist ~~ $other.gist;
+    }
+
+
 }

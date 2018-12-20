@@ -3,7 +3,7 @@ use Test;
 use Fluca1978::Utils::PostgreSQL::PGVersion;
 plan 3;
 
-use-ok( 'PGBrew::Utils::PGVersion' );
+use-ok( 'Fluca1978::Utils::PostgreSQL::PGVersion' );
 
 subtest 'NEW Version number parsing' => {
 
@@ -71,5 +71,23 @@ subtest 'OLD version number parsing' => {
     isnt( $version.is-alfa, True, 'Alfa old version' );
     isnt( $version.is-beta, True, 'Beta old version' );
     is( $version.development-number, Nil, 'Extract old beta number' );
+}
 
+subtest 'URL' => {
+    my $version = PGVersion.new: :version-string( 'v11.1' );
+    is( $version.http-download-url, 'https://ftp.postgresql.org/pub/source/v11.1/postgresql-11.1.tar.bz2' );
+    $version.parse: 'v7.3.5';
+    is( $version.http-download-url, 'https://ftp.postgresql.org/pub/source/v7.3.5/postgresql-7.3.5.tar.gz' );
+
+}
+
+
+subtest 'ACCEPTS and smart matching' => {
+    my $version-a = PGVersion.new: :version-string( '10.1' );
+    my $version-b = PGVersion.new: :version-string( 'v9.6.5' );
+
+    is( $version-a ~~ $version-a, True, 'Smart matching against self' );
+    is( $version-a ~~ $version-b, False, 'Smart matching against different version' );
+    is( $version-a ~~ 'v10.1', True, 'Smart matching against self string' );
+    is( $version-b.gist ~~ '9.6.5', True, 'Smart matching against self string' );
 }
