@@ -16,13 +16,14 @@ class PGVersion {
     has Int $!year-number    = 0;
     has Int $!minor-number   = 0;
 
-    has Str $!type           = 'R';  # R = Release, A = Alfa, B = Beta
+    has Str $!development-type = ''; # can assume 'alfa' or 'beta'
 
     has Str $!http-download;
 
 
-    method is-alfa( --> Bool ){ 'A' ~~ $!type; }
-    method is-beta( --> Bool ){ 'B' ~~ $!type; }
+    method is-alfa( --> Bool ){ 'alfa' eq $!development-type; }
+    method is-beta( --> Bool ){ 'beta' eq $!development-type; }
+    method is-release( --> Bool ){ ! $!development-type; }
 
     # Utility method to know if the numbering scheme has
     # two only digits (i.e., 10 ongoing or less than 6 )
@@ -49,7 +50,7 @@ class PGVersion {
         if self!use-two-numbers {
             return '%d%s%d'.sprintf:
             $!brand-number,
-            self.is-alfa ?? 'alfa' !! self.is-beta ?? 'beta' !! '.',
+            self.is-release ?? '.' !! $!development-type,
             $!minor-number;
         }
         else {
@@ -73,12 +74,12 @@ class PGVersion {
         return '%s (Major: %s, Minor: %s, stable)'.sprintf:
         self.gist,
         self.major-number,
-        self.minor-number  if ! self.is-alfa && ! self.is-beta;
+        self.minor-number  if self.is-release;
 
         # an unstable version
         return '%s (%s %d of development branch %d)'.sprintf:
         self.gist,
-        self.is-alfa ?? 'alfa' !! 'beta',
+        $!development-type,
         $!minor-number,
         self.major-number;
 
@@ -93,7 +94,7 @@ class PGVersion {
         return '%02d%02d%02d'.sprintf:
         $!brand-number,
         $!year-number,
-        $!minor-number;
+        self.is-release ?? $!minor-number !! 0 ;
     }
 
     # Construct the object by means of a version string.
@@ -117,7 +118,7 @@ class PGVersion {
         $!brand-number = 0;
         $!year-number  = 0;
         $!minor-number = 0;
-        $!type         = 'R';
+        $!development-type = '';
 
         # old-numbering: v9.6.5
         if $string ~~ / <[vV]>?
@@ -140,14 +141,16 @@ class PGVersion {
             $!minor-number  = $/<second>.Int;
             return True;
         }
-        elsif $string ~~ / <[vV]>? $<first>=(\d ** 1..2 ) $<dev>=( < alfa | beta > ) $<dev-n>=( \d ) / {
+        elsif $string ~~ / <[vV]>? $<first>=(\d ** 1..2 ) $<dev>=(  <  alfa | beta > ) $<dev-n>=( \d ) / {
             # unstable new numbering v11beta3
-            $!brand-number = $/<first>.Int;
-            $!year-number  = 0;
-            $!minor-number = $/<dev-n>.Int || 0;
-            $!type = $/<dev> ~~ 'alfa' ?? 'A' !! 'B';
+            $!brand-number     = $/<first>.Int;
+            $!year-number      = 0;
+            $!minor-number     = $/<dev-n>.Int || 0;
+            $!development-type = $/<dev>.Str;
             return True;
         }
+
+
 
         # unknown version string!
         return False;
