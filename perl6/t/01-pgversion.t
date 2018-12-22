@@ -26,6 +26,16 @@ subtest 'NEW Version number parsing' => {
     is( $version.development-number, 3, 'Extract beta number' );
     is( $version.server-version-num, '110000', 'SHOW SERVER_VERSION_NUM' );
 
+    $version-string = '11beta2'.uc;
+    $version.parse: 'v' ~ $version-string;
+    is( $version.gist, $version-string.lc, 'Stringify camel case beta version number' );
+    is( $version.major-number, 11.Str, 'Get beta version number' );
+    is( $version.minor-number, Nil, 'Get minor beta version number' );
+    isnt( $version.is-alfa, True, 'Alfa version' );
+    is( $version.is-beta, True, 'Beta version' );
+    is( $version.development-number, 2, 'Extract beta number' );
+    is( $version.server-version-num, '110000', 'SHOW SERVER_VERSION_NUM' );
+
     $version-string = '11alfa4';
     $version.parse: $version-string;
     is( $version.gist, $version-string, 'Stringify version number' );

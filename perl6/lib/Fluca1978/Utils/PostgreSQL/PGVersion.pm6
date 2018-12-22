@@ -131,7 +131,7 @@ class PGVersion {
             $!brand-number     = $/<first>.Int;
             $!year-number      = $/<third>.Int ?? $/<second>.Int !! 0;
             $!minor-number     = $/<third>.Int ?? $/<third>.Int  !! $/<second>.Int;
-            $!development-type = $/<dev>.Str eq '.' ?? '' !! $/<dev>.Str;
+            $!development-type = $/<dev>.Str eq '.' ?? '' !! $/<dev>.Str.lc;
             return True;
         }
 
