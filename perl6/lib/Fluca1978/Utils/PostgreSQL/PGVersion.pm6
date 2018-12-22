@@ -121,27 +121,27 @@ class PGVersion {
         $!development-type = '';
 
         # old-numbering: v9.6.5
-        if $string ~~ / <[vV]>?
+        if $string ~~ / :i v?
                         $<first>=(\d ** 1..2 )
-                        <[.]>
+                        [.]
                         $<second>=(\d ** 1..2 )
-                        <[.]>
+                        [.]
                         $<third>=(\d ** 1..2 )/ {
             $!brand-number  = $/<first>.Int;
             $!year-number = $/<second>.Int;
             $!minor-number  = $/<third>.Int;
             return True;
         }
-        elsif $string ~~ / <[vV]>?
+        elsif $string ~~ / :i v?
                            $<first>=(\d ** 1..2 )
-                           <[.]>
+                           [.]
                            $<second>=(\d ** 1..2 ) / {
             # stable new numbering v10.1
             $!brand-number  = $/<first>.Int;
             $!minor-number  = $/<second>.Int;
             return True;
         }
-        elsif $string ~~ / <[vV]>? $<first>=(\d ** 1..2 ) $<dev>=(  <  alfa | beta > ) $<dev-n>=( \d ) / {
+        elsif $string ~~ / :i v? $<first>=(\d ** 1..2 ) $<dev>=(  alfa || beta ) $<dev-n>=( \d ) / {
             # unstable new numbering v11beta3
             $!brand-number     = $/<first>.Int;
             $!year-number      = 0;
