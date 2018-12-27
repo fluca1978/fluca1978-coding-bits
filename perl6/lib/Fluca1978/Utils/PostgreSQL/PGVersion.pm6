@@ -91,10 +91,11 @@ class PGVersion {
     # SHOW server_version_num
     method server-version { return self.gist; }
     method server-version-num {
-        return '%d%02d%d'.sprintf:
-        $!brand-number * 10,
-        $!year-number  * 10,
-        self.is-release ?? $!minor-number !! 0 ;
+        # 9.6.5 -> 90605
+        # 10.1  -> 100001
+        return $!brand-number * 10000
+        + $!year-number  * 100
+        + ( self.is-release ?? $!minor-number !! 0 );
     }
 
     # Construct the object by means of a version string.
@@ -120,6 +121,22 @@ class PGVersion {
         $!minor-number = 0;
         $!development-type = '';
 
+
+        # allow the building form a string with
+        # the server num format
+        # e.g., 90605
+        if $string.Int && $string.chars >= 5 {
+            my @values = $string.split: '';
+            my $index = 0; # the split inserts a first null char as @values[0]
+            $!brand-number     = Int.new: ( @values[ ++$index ] ~ @values[ ++$index ] ) / ( $string.chars == 5 ?? 10 !! 1 );
+            $!year-number      = Int.new: ( @values[ ++$index ] ~ @values[ ++$index ] ) / 10;
+            $!minor-number     = Int.new: @values[ ++$index ] ~ @values[ ++$index ];
+            $!development-type = '';
+
+            return True;
+        }
+
+
         # old-numbering: v9.6.5
         # new numbering: v10.1
         if $string ~~ / :i v?
@@ -134,6 +151,7 @@ class PGVersion {
             $!development-type = $/<dev>.Str eq '.' ?? '' !! $/<dev>.Str.lc;
             return True;
         }
+        
 
 
         # unknown version string!

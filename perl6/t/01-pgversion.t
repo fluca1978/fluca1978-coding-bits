@@ -1,7 +1,7 @@
 use v6;
 use Test;
 use Fluca1978::Utils::PostgreSQL::PGVersion;
-plan 5;
+plan 6;
 
 use-ok( 'Fluca1978::Utils::PostgreSQL::PGVersion' );
 
@@ -112,4 +112,25 @@ subtest 'ACCEPTS and smart matching' => {
 
     is( $version-a.newer( $version-b ), True, 'Newer version' );
     is( $version-b.older( $version-a ), True, 'Older version' );
+}
+
+
+subtest 'Build from version number' => {
+    my $version = PGVersion.new: :version-string( '90605' );
+    my $version-string = '9.6.5';
+    is( $version.gist, $version-string, 'Stringify OLD version number' );
+    is( $version.major-number, '9.6', 'Get old version number' );
+    is( $version.minor-number, 5, 'Get old minor version number' );
+    isnt( $version.is-alfa, True, 'Alfa old version' );
+    isnt( $version.is-beta, True, 'Beta old version' );
+    is( $version.development-number, Nil, 'Extract old beta number' );
+
+    $version = PGVersion.new: :version-string( '100001' );
+    $version-string = '10.1';
+    is( $version.gist, $version-string, 'Stringify NEW version number' );
+    is( $version.major-number, '10', 'Get version number' );
+    is( $version.minor-number, 1, 'Get minor version number' );
+    isnt( $version.is-alfa, True, 'Alfa version' );
+    isnt( $version.is-beta, True, 'Beta version' );
+    is( $version.development-number, Nil, 'Extract  beta number' );
 }

@@ -1,6 +1,7 @@
 use Fluca1978::Utils::PostgreSQL::PGVersion;
 
-for <10.1 11beta1 11.1 9.6.5 6.11> {
+for <10.1 11beta1 11.1 9.6.5 6.11 90605 100003> {
+    say "Building for version $_";
     my $v = PGVersion.new: :version-string( $_ );
     say "PostgreSQL version is $v";
     say "or for short { $v.gist }";
