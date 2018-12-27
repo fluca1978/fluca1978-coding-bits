@@ -104,12 +104,25 @@ class PGVersion {
         self.parse( $version-string );
     }
 
+    # Construct the object by means of the three version numbers.
+    # Please note that only the brand version is mandatory,
+    # since the other twos are set to zero automatically.
     multi method BUILD( Int :$brand-number!, Int :$year-number, Int :$minor-number  ){
-        $!brand-number     = $brand-number;
-        $!year-number      = $year-number // 0;
-        $!minor-number     = $minor-number // 0;
-        $!development-type = '';
+        self.reset;
+        $!brand-number  = $brand-number;
+        $!year-number   = $year-number // 0;
+        $!minor-number  = $minor-number // 0;
+    }
 
+
+    # Reset all the values.
+    method reset {
+        # reset all variabiles, allowing this object
+        # to re-parse a different string
+        $!brand-number = 0;
+        $!year-number  = 0;
+        $!minor-number = 0;
+        $!development-type = '';
     }
 
     # A method to parse a string
@@ -123,12 +136,7 @@ class PGVersion {
     # 11beta3
     method parse( Str $string! ){
 
-        # reset all variabiles, allowing this object
-        # to re-parse a different string
-        $!brand-number = 0;
-        $!year-number  = 0;
-        $!minor-number = 0;
-        $!development-type = '';
+        self.reset;
 
 
         # allow the building form a string with
