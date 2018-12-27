@@ -93,9 +93,10 @@ class PGVersion {
     method server-version-num {
         # 9.6.5 -> 90605
         # 10.1  -> 100001
-        return $!brand-number * 10000
-        + $!year-number  * 100
-        + ( self.is-release ?? $!minor-number !! 0 );
+        return '%d%d%d'.sprintf:
+            $!brand-number * ( $!brand-number >= 10 ?? 100 !! 10 ),
+            $!year-number * 10,
+            ( self.is-release ?? $!minor-number !! 0 );
     }
 
     # Construct the object by means of a version string.
@@ -126,6 +127,7 @@ class PGVersion {
         # the server num format
         # e.g., 90605
         if $string.Int && $string.chars >= 5 {
+            my $version = $string.Int;
             my @values = $string.split: '';
             my $index = 0; # the split inserts a first null char as @values[0]
             $!brand-number     = Int.new: ( @values[ ++$index ] ~ @values[ ++$index ] ) / ( $string.chars == 5 ?? 10 !! 1 );
@@ -135,11 +137,7 @@ class PGVersion {
 
             return True;
         }
-
-
-        # old-numbering: v9.6.5
-        # new numbering: v10.1
-        if $string ~~ / :i v?
+        elsif  $string ~~ / :i v?
                         $<first>=(\d ** 1..2 )
                         $<dev>=( alfa || beta || [.] )
                         $<second>=(\d ** 1..2 )
