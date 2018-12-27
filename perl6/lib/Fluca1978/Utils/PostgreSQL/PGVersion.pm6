@@ -18,8 +18,6 @@ class PGVersion {
 
     has Str $!development-type = ''; # can assume 'alfa' or 'beta'
 
-    has Str $!http-download;
-
 
     method is-alfa( --> Bool ){ 'alfa' eq $!development-type; }
     method is-beta( --> Bool ){ 'beta' eq $!development-type; }
