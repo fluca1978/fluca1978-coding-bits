@@ -1,7 +1,7 @@
 use v6;
 use Test;
 use Fluca1978::Utils::PostgreSQL::PGVersion;
-plan 6;
+plan 7;
 
 use-ok( 'Fluca1978::Utils::PostgreSQL::PGVersion' );
 
@@ -62,6 +62,7 @@ subtest 'OLD version number parsing' => {
     isnt( $version.is-alfa, True, 'Alfa old version' );
     isnt( $version.is-beta, True, 'Beta old version' );
     is( $version.development-number, Nil, 'Extract old beta number' );
+    is( $version.server-version-num, '90605', 'SHOW SERVER_VERSION_NUM' );
 
     $version-string = '9.6.5';
     $version.parse: $version-string;
@@ -133,4 +134,29 @@ subtest 'Build from version number' => {
     isnt( $version.is-alfa, True, 'Alfa version' );
     isnt( $version.is-beta, True, 'Beta version' );
     is( $version.development-number, Nil, 'Extract  beta number' );
+}
+
+
+subtest 'Build with explicit numbers' => {
+    my $version = PGVersion.new: :brand-number(10), :minor-number(3);
+    my $version-string = '10.3';
+    is( $version.gist, $version-string, 'Stringify version number' );
+    is( $version.major-number, '10', 'Get version number' );
+    is( $version.minor-number, 3, 'Get minor version number' );
+    isnt( $version.is-alfa, True, 'Alfa version' );
+    isnt( $version.is-beta, True, 'Beta version' );
+    is( $version.development-number, Nil, 'Extract  beta number' );
+    is( $version.server-version-num, '100003', 'Get server version num' );
+
+
+
+    $version = PGVersion.new: :brand-number(9), :minor-number(3), :year-number(6);
+    $version-string = '9.6.3';
+    is( $version.gist, $version-string, 'Stringify version number' );
+    is( $version.major-number, '9.6', 'Get version number' );
+    is( $version.minor-number, 3, 'Get minor version number' );
+    isnt( $version.is-alfa, True, 'Alfa version' );
+    isnt( $version.is-beta, True, 'Beta version' );
+    is( $version.development-number, Nil, 'Extract  beta number' );
+    is( $version.server-version-num, '90603', 'Get server version num' );
 }

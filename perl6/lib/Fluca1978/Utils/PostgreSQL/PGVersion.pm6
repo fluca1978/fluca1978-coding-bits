@@ -100,8 +100,16 @@ class PGVersion {
     }
 
     # Construct the object by means of a version string.
-    method BUILD( :$version-string! ){
+    multi method BUILD( Str :$version-string! ){
         self.parse( $version-string );
+    }
+
+    multi method BUILD( Int :$brand-number!, Int :$year-number, Int :$minor-number  ){
+        $!brand-number     = $brand-number;
+        $!year-number      = $year-number // 0;
+        $!minor-number     = $minor-number // 0;
+        $!development-type = '';
+
     }
 
     # A method to parse a string
