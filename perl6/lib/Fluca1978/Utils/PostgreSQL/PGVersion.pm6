@@ -174,11 +174,11 @@ class PGVersion {
     }
 
     method newer( PGVersion $version ){
-        self.server-version-num > $version.server-version-num;
+        self.server-version-num.Int > $version.server-version-num.Int;
     }
 
     method older( PGVersion $version ){
-        self.server-version-num < $version.server-version-num;
+        self.server-version-num.Int < $version.server-version-num.Int;
     }
 
 }
