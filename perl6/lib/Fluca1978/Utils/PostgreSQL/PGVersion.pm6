@@ -12,10 +12,9 @@
 # there are two integers to keep track of an alfa or beta number, if they
 # are greater than zero the version is an experimental one.
 class PGVersion {
-    has Int $!brand-number   = 0;
-    has Int $!year-number    = 0;
-    has Int $!minor-number   = 0;
-
+    has Int $!brand-number     = 0;
+    has Int $!year-number      = 0;
+    has Int $!minor-number     = 0;
     has Str $!development-type = ''; # can assume 'alfa' or 'beta'
 
 
