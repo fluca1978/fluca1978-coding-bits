@@ -91,9 +91,9 @@ class PGVersion {
     # SHOW server_version_num
     method server-version { return self.gist; }
     method server-version-num {
-        return '%02d%02d%02d'.sprintf:
-        $!brand-number,
-        $!year-number,
+        return '%d%02d%d'.sprintf:
+        $!brand-number * 10,
+        $!year-number  * 10,
         self.is-release ?? $!minor-number !! 0 ;
     }
 

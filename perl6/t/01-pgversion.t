@@ -71,7 +71,7 @@ subtest 'OLD version number parsing' => {
     isnt( $version.is-alfa, True, 'Alfa old version' );
     isnt( $version.is-beta, True, 'Beta old version' );
     is( $version.development-number, Nil, 'Extract old beta number' );
-    is( $version.server-version-num, '090605', 'SHOW SERVER_VERSION_NUM' );
+    is( $version.server-version-num, '90605', 'SHOW SERVER_VERSION_NUM' );
 
     $version-string = '6.3.2';
     $version.parse: $version-string;
