@@ -237,21 +237,21 @@ class PGVersion {
 
     # Check if this version is the same of another version.
     method ACCEPTS ( PGVersion $other ){
-        self.server-version-num == $other.server-version-num;
+        self cmp $other ~~ Order::Same;
     }
 
     method newer( PGVersion $version ){
-        self.server-version-num.Int > $version.server-version-num.Int;
+        self cmp $version ~~ Order::More;
     }
 
     method older( PGVersion $version ){
-        self.server-version-num.Int < $version.server-version-num.Int;
+        self cmp $version ~~ Order::Less;
     }
 
 
     # Comparison operator.
     multi sub infix:<cmp>( PGVersion $left, PGVersion $right ){
-        $left.server-version-num cmp $right.server-version-num;
+        $left.server-version-num <=> $right.server-version-num;
     }
 
 }
