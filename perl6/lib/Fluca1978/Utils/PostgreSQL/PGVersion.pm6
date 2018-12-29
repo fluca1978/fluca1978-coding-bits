@@ -226,7 +226,10 @@ class PGVersion {
     # Computes the available downloadable link
     # from the official web site or the base specified.
     #
-    #
+    # In the case the brand number is less or equal to 7
+    # the function defaults to provide a link to a tar.gz archive,
+    # while for other more recent versions (i.e., 8 or greater)
+    # the function defaults to a .tar.bz2 archive.
     method http-download-url( Str :$base = 'https://ftp.postgresql.org/pub/source' ){
         return '%s/%s/postgresql-%s.tar.%s'.sprintf:
         $base,
