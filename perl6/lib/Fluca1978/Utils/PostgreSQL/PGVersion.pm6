@@ -1,16 +1,70 @@
 # PGVersion
 # Copyright 2018 Luca Ferrari
 # Released under the BSD Licence
-#
-# This class handles the PostgreSQL versioning number scheme.
-# The object stores all available numbers as integers and knows
-# how to return a major number and minor. Since a major number can
-# be made by two digits with a dot (e.g., 9.6) the major number is
-# always returned as a string, other numbers are returned as integers.
-#
-# The object stores also the information about alfa and beta versions:
-# there are two integers to keep track of an alfa or beta number, if they
-# are greater than zero the version is an experimental one.
+
+=begin pod
+
+=TITLE PGVersion - a class to handle PostgreSQL version strings
+
+=SUBTITLE SYNOPSIS
+     my $v = PGVersion.new: :version-string( 'v9.6.5' );
+     say $v.gist;  # 9.6.5
+     say $v;       # v9.6.5
+
+     my $v = PGVersion.new: :brand-number( 10 ), :minor-number( 3 );
+     say $v.server-version-num; # 100003
+
+=SUBTITLE Description
+
+This class allows you for quickly and consistently manage PostgreSQL
+server version strings and numbers, providing facilities to convert
+a string (or number) into an object.
+
+The class provides different methods to inspect a version a compare different
+objects with regard to their version details.
+
+Internally, the class handles a version splitting it into three parts (brand, year and
+minor numbers) and a flag to keep track of the alfa/beta/release status of the
+version itself.
+
+=SUBTITLE Methods
+
+=item C<major-number> returns a string with the major number,
+for instance '9.6', '10'.
+
+=item C<minor-number> provides an integer with the minor number
+of the PostgreSQL version
+
+=item C<development-number> if the version is an alfa or beta one,
+this method provides an integer with the number of development. For instance
+in the case '11beta3' it return C<3>.
+
+=item C<gist>, C<Str>, C<Str( Bool) > provide a stringified version
+of the object. The C<gist> provides only the numbers separated by a dot,
+the C<Str> applies a 'v' in front of the number and in the case of a C<True>
+optional parameter provides a descvriptive string (useful for output in verbose
+listings)
+
+=item C<server-version> same as C<gist>
+
+=item C<server-version-num> provides a string with only numbers as in
+executing C<SHOW server_version_num;> in a PostgreSQL server connection.
+
+=item C<reset> invalidates the object resetting all the fields
+
+=item C<parse> initializes the object with values extracted from a version string.
+Valid strings are: C<v9.6.5>, C<10.1>, C<v11beta1>, C<90605>.
+
+=item http-download-url( Str :base ) provides a link to download the specified
+version of PostgreSQL. The C<$base> optional argument can be initialized to a
+downloadable repository, by default the PostgreSQL one.
+
+=item C<newer>, C<older>, C<ACCEPTS> compares this object against another
+version
+
+=end pod
+
+
 class PGVersion {
     has Int $!brand-number     = 0;
     has Int $!year-number      = 0;
@@ -192,6 +246,12 @@ class PGVersion {
 
     method older( PGVersion $version ){
         self.server-version-num.Int < $version.server-version-num.Int;
+    }
+
+
+    # Comparison operator.
+    multi sub infix:<cmp>( PGVersion $left, PGVersion $right ){
+        $left.server-version-num cmp $right.server-version-num;
     }
 
 }

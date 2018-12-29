@@ -1,7 +1,7 @@
 use v6;
 use Test;
 use Fluca1978::Utils::PostgreSQL::PGVersion;
-plan 7;
+plan 8;
 
 use-ok( 'Fluca1978::Utils::PostgreSQL::PGVersion' );
 
@@ -159,4 +159,15 @@ subtest 'Build with explicit numbers' => {
     isnt( $version.is-beta, True, 'Beta version' );
     is( $version.development-number, Nil, 'Extract  beta number' );
     is( $version.server-version-num, '90603', 'Get server version num' );
+}
+
+
+subtest 'Comparison' => {
+    my $version-a = PGVersion.new: :brand-number(9), :minor-number(3), :year-number(6);
+    my $version-b = PGVersion.new: :brand-number(9), :minor-number(6), :year-number(3);
+    my $version-c = $version-a;
+    is( $version-a cmp $version-b, Order::More, 'Comparing older version' );
+    is( $version-b cmp $version-a, Order::Less, 'Comparing newer version' );
+    is( $version-c cmp $version-a, Order::Same, 'Comparing same version' );
+    
 }
