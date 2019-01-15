@@ -46,7 +46,7 @@ set grid
 set style fill solid 1.0
 set boxwidth 0.9 relative
 
-plot "$data_file"  using 1:2 title "" with boxes linecolor rgb "#bbFFFF"
+plot "$data_file"  using 1:2 title "" with boxes linecolor rgb "#bb00FF"
 GNUPLOT
     close $gnuplot;
 
