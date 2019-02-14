@@ -17,11 +17,18 @@ EOF
     exit 1
 fi
 
+DST_GIT=$( pwd )/$( basename "$SRC_GIT" )
+
+if [ "$SRC_GIT" = "$DST_GIT" ]; then
+    echo "Cannot clone a repo over itself!"
+    exit 1
+fi
+
 cat <<EOF
 I will clone
   $SRC_GIT
 into local folder
-  $(pwd)
+  $DST_GIT
 creating the remote ref
   $SRC_NAME
 into it and adding, if needed, the remote ref
@@ -38,7 +45,7 @@ case "$ANSWER" in
 esac
 
 
-DST_GIT=$( pwd )/$( basename "$SRC_GIT" )
+
 
 echo "Step 1: clone remote [$SRC_GIT] into $(pwd) ... "
 git clone "$SRC_GIT"
