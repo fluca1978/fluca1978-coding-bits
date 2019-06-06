@@ -1,5 +1,6 @@
 #!env perl
-
+# example invocation
+# % perl ~/git/fluca1978-coding-bits/perl/jekyll_post_count.pl ~/git/fluca1978.github.io/_posts ~/git/fluca1978.github.io/images/posts/graphs
 use v5.20;
 use File::Find;
 use Data::Dumper;
