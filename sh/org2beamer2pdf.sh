@@ -24,7 +24,7 @@ echo "Searching for org files in [$DIR]"
 cd $DIR
 for forg in *.org
 do
-    echo "Converting [$forg] ..."
+    echo -n "Converting [$forg] ... "
     $EMACS --batch $forg -f org-beamer-export-to-pdf > /dev/null 2>&1
     if [ $? -eq 0 ]; then
         echo "ok!"
