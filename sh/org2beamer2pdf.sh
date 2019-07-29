@@ -12,7 +12,7 @@ fi
 
 
 if [ -z "$DIR" ]; then
-    DIR=$(cwd)
+    DIR=$(pwd)
 fi
 
 if [ ! -d "$DIR" ]; then
