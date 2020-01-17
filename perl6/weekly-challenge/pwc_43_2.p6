@@ -33,6 +33,9 @@ my $m = 6210001000;
 sub MAIN( :$base? where { (10,4,5,7,8,9,11,12,16,36).grep: $base } = 10 ){
     say "Starting generation for base $base";
 
+    # I need to do something for other bases!
+    die "Not implemented!" if $base > 10;
+
     # there must be always at least one zero!
     my @tasks;
     for ( $base - 4 ) .. ( $base - 1 ) {
