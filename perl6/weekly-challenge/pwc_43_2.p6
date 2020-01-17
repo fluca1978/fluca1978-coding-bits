@@ -36,23 +36,37 @@ sub MAIN( :$base? where { (10,4,5,7,8,9,11,12,16,36).grep: $base } = 10 ){
     # I need to do something for other bases!
     die "Not implemented!" if $base > 10;
 
-    my @tasks;
-    for ( $base - 4 ) .. ( $base - 1 ) {
-        @tasks.push:  Promise.start( {
-            # see <https://medium.com/@divyangrpatel/self-descriptive-number-best-algorithm-95b281e6de05>
-            my $start = '%d21%s1000'.sprintf: $_, '0' x ( $base - 4 - 3 ).Int;
-            my $end   = '%d21%s1000'.sprintf: $_, ( $base - 1 ) x ( $base - 4 - 3 ).Int;
-            say "\tBatch between $start and $end";
+    if ( $base <= 5 ) {
+        my $end = ( $base - 1 ).Str x $base;
+        my @nums = grep { validate $_.Int, $base }, 0 .. $end.Int;
+        "\nWhat did we generate?\n".say;
+        for @nums {
+            .say
+        }
+    }
+    else {
+        # if the base is greater than 5 do a parallel scan
 
-            my @nums = grep { validate $_.Int, $base }, $start .. $end;
-        } );
+        my @tasks;
+        for ( $base - 4 ) .. ( $base - 1 ) {
+            @tasks.push:  Promise.start( {
+                 # see <https://medium.com/@divyangrpatel/self-descriptive-number-best-algorithm-95b281e6de05>
+                 my $start = '%d21%s1000'.sprintf: $_, '0' x ( $base - 4 - 3 ).Int;
+                 my $end   = '%d21%s1000'.sprintf: $_, ( $base - 1 ) x ( $base - 4 - 3 ).Int;
+                 say "\tBatch between $start and $end";
+
+                my @nums = grep { validate $_.Int, $base }, $start .. $end;
+             } );
+        }
+
+        await @tasks;
+        "\nWhat did we generate?\n".say;
+        for @tasks {
+            .result.say if .result;
+        }
+
     }
 
-    await @tasks;
-    "\nWhat did we generate?\n".say;
-    for @tasks {
-        .result.say if .result;
-    }
     say "\nBye bye!";
 }
 
