@@ -30,14 +30,21 @@ sub MAIN( Int :$final-value = 200,
     my @moves;
 
     while ( $current-val > $initial-value ) {
-        if $current-val %% 2 {
-            @moves.unshift: 'double to get %d $'.sprintf( $current-val );
-            $current-val /= 2;
-        }
-        else {
-            @moves.unshift: 'add one buck to get %d $'.sprintf( $current-val );
-            $current-val -= 1;
-        }
+
+        @moves.unshift: '%s to get %d $'
+                            .sprintf( $current-val %% 2 ?? 'double' !! 'add one buck', $current-val );
+        $current-val = $current-val %% 2 ?? $current-val / 2 !! $current-val - 1;
+
+        # given  $current-val %% 2 {
+        #     when .so {
+        #         @moves.unshift: 'double to get %d $'.sprintf( $current-val );
+        #         $current-val /= 2;
+        #     }
+        #     when ! .so {
+        #         @moves.unshift: 'add one buck to get %d $'.sprintf( $current-val );
+        #         $current-val -= 1;
+        #     }
+        # };
     }
 
     @moves.unshift: 'Start with one buck';
