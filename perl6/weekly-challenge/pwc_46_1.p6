@@ -60,15 +60,10 @@ sub decode( @message ) {
     @chars.push: .split( / \s+ /, :skip-empty ) for @message;
     @chars = [Z] @chars;
 
-    # now for every inner list, gets the chars that are
-    # present multiple times
-    for @chars -> @line {
-        for @line -> $searching_for {
-            if @line.grep( { $_ eq $searching_for} ).elems > 1 {
-                $decoded ~= $searching_for;
-                last;
-            }
-        }
+    # on every line search for a character that appears
+    # two times or more
+    for @chars {
+        $decoded ~= $/[0] if / (\w) .* $0 .* /
     }
 
     return $decoded;
