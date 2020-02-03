@@ -57,18 +57,8 @@ sub decode( @message ) {
     my @chars;
     my $decoded;
 
-    # covnert every line of the message into single chars
-    # and push them as an array for every position within the
-    # string. It produces something like:
-    # [[P 1 5 P 2 <] [+ e - x e !] [2 8 r w 3 r]
-    # [l 0 ] l 5 ^] [! R + b R (] [a $ a 3 8 )]
-    # [t 4 > k y k] [o u / \ u 0]]
-    for @message -> $single-line {
-        for $single-line.split( '', :skip-empty ) {
-            next if ! $_.trim;
-            @chars[ $++ ].push: $_;
-        }
-    }
+    @chars.push: .split( / \s+ /, :skip-empty ) for @message;
+    @chars = [Z] @chars;
 
     # now for every inner list, gets the chars that are
     # present multiple times
