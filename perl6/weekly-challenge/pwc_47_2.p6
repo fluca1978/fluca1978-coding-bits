@@ -21,10 +21,11 @@ sub MAIN( Int:D :$limit = 20 ) {
     for 100 .. Inf {
         $_ ~~ / ^ $<first>=\d \d+ $<last>=\d $ /;
         my $divisor = ( $/<first> ~ $/<last> ).Int;
-        @found.push: $divisor if $_ %% $divisor && ! @found.grep: { $_ == $divisor };
+        next if $divisor == 0;
+        @found.push: $_ if $_ %% $divisor && ! @found.grep: { $_ == $divisor };
         last if @found.elems == $limit;
     }
 
-    "Here it is what I found, first $limit Gapful Numbers:\n".say;
-    @found.sort.join( "\n\t" ).say;
+    "Here it is what I found, first $limit Gapful Numbers:".say;
+    @found.sort.join( "\n" ).say;
 }
