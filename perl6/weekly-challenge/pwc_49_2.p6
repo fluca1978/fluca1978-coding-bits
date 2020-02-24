@@ -101,22 +101,17 @@ class LRU {
 
         # now remove the element from the array and
         # insert it on the right incremented
-        @!values.splice( $where, 1 );
-        @!values.append: $pair.key => $pair.value + 1;
+        @!values[ $where ]:delete;
+        @!values .= grep( { .so } ).append: $pair.key => $pair.value + 1;
 
         # here $pair still holds the old value
         return $pair.value;
     }
 
-    # Is the cache full?
-    method !is-full() { return @!values.elems >= $!capacity; }
-
-    # remove the least recently used value, always the one on the left
-    method !make-space() { @!values.splice( 0, 1 ); }
-
     method set( Int $value, Int $how-many-times ) {
         # make some space if the cache is full
-        self!make-space() if self!is-full;
+        @!values.shift if @!values.elems >= $!capacity;
+        # now add the data
         @!values.push: $value => $how-many-times;
     }
 
