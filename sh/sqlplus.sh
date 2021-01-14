@@ -7,7 +7,8 @@
 
 ORACLE_DEFAULT_USERNAME="luca"
 ORACLE_DEFAULT_ENGINE="test"
-ORACLE_DEFAULT_SERVER="localhost"
+ORACLE_DEFAULT_PORT=1521
+ORACLE_DEFAULT_SERVER="localhost:$ORACLE_DEFAULT_PORT"
 
 
 ###########################################
@@ -28,9 +29,29 @@ if [ ! -x "$SQL_PLUS_EXECUTABLE" ]; then
 fi
 
 
+# Ask the user if the default connection properties are fine
+if [ ! -z "$ORACLE_DEFAULT_USERNAME" -a ! -z "$ORACLE_DEFAULT_SERVER" -a ! -z "$ORACLE_DEFAULT_ENGINE" ]; then
+    CONNECTION_STRING="$ORACLE_DEFAULT_USERNAME@$ORACLE_DEFAULT_SERVER/$ORACLE_DEFAULT_ENGINE"
+    echo -en "Does this connection sound good?\n\t$CONNECTION_STRING\n\nOK (Y/n)? "
+    read -n 1 answer
+    case $answer in
+        n|N|no|NO|No|nO)
+            echo -e "\nPlease specify the following parameters"
+            read -p "Username [$ORACLE_DEFAULT_USERNAME] ? " ORACLE_USERNAME
+            read -p "Server [$ORACLE_DEFAULT_SERVER] ? "     ORACLE_SERVER
+            read -p "Engine [$ORACLE_DEFAULT_ENGINE]? "      ORACLE_ENGINE
+            ;;
+        *)
+            ;;
+    esac
 
-read -p "Username [$ORACLE_DEFAULT_USERNAME] ? " ORACLE_USERNAME
-ORACLE_USERNAME=${ORACLE_USERNAME:-$ORACLE_DEFAULT_USERNAME}
+    # set arguments to default or what the user has entered
+    ORACLE_USERNAME=${ORACLE_USERNAME:-$ORACLE_DEFAULT_USERNAME}
+    ORACLE_SERVER=${ORACLE_SERVER:-$ORACLE_DEFAULT_SERVER}
+    ORACLE_ENGINE=${ORACLE_ENGINE:-$ORACLE_DEFAULT_ENGINE}
+fi
+
+# here ask for the missing arguments like password and schema
 read -p "Oracle Schema (proxy) ? " ORACLE_SCHEMA
 
 # make a proxy user by using the syntax
@@ -42,17 +63,13 @@ if [ ! -z "$ORACLE_SCHEMA" ]; then
     ORACLE_USERNAME="$ORACLE_USERNAME[$ORACLE_SCHEMA]"
 fi
 
-read -p "$ORACLE_USERNAME password ? "    -s ORACLE_PASSWORD
+read -p "$ORACLE_USERNAME password (will not echo chars) ? "    -s ORACLE_PASSWORD
 echo
-read -p "Server [$ORACLE_DEFAULT_SERVER] ? " ORACLE_SERVER
-ORACLE_SERVER=${ORACLE_SERVER:-$ORACLE_DEFAULT_SERVER}
-read -p "Engine [$ORACLE_DEFAULT_ENGINE]? "  ORACLE_ENGINE
-ORACLE_ENGINE=${ORACLE_ENGINE:-$ORACLE_DEFAULT_ENGINE}
 
 
 
 # do the connection!
 clear
-echo "Connecting $ORACLE_USERNAME @ $ORACLE_SERVER/$ORACLE_ENGINE ..."
+echo "Connecting $ORACLE_USERNAME@$ORACLE_SERVER/$ORACLE_ENGINE ..."
 CONNECTION_STRING="$ORACLE_USERNAME"/"$ORACLE_PASSWORD"@"$ORACLE_SERVER"/"$ORACLE_ENGINE"
 $SQL_PLUS_EXECUTABLE $CONNECTION_STRING
