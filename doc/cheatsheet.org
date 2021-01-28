@@ -1,0 +1,46 @@
+#+title: Cheat Sheet
+#+author: Luca Ferrari
+#+email: fluca1978@gmail.com
+
+
+* Emacs
+** Movements
+- ~CTRL~ is used to move the cursor by *one character*;
+- ~META~ (usually ~ALT~) is used to move the cursor by a *large chunk* (for example a paragraph);
+- ~META-CTRL~ is used to move by a `s-exp` that is a /balanced expression/.
+
+| Keys  | Direction | Movement                         | Mnemonic                |
+|-------+-----------+----------------------------------+-------------------------|
+| C-f   | right     | One character right              | /forward/               |
+| M-f   | right     | One word right                   | /forward/               |
+| C-b   | left      | One character left               | /back/                  |
+| M-b   | left      | One word left                    | /back/                  |
+| C-p   | up        | One character up                 | /previous/              |
+| C-n   | down      | One character down               | /next/                  |
+|-------+-----------+----------------------------------+-------------------------|
+| C-a   | left      | Beginning of the line            | /a/ is the first letter |
+| M-a   | left      | Beginning of the parapgraph      | /a/ is the first letter |
+| C-e   | right     | End of the line                  | /end/                   |
+| M-e   | right     | End of the paragraph             | /end/                   |
+|-------+-----------+----------------------------------+-------------------------|
+| M-<   | left      | Beginning of the buffer          | /arrow left/            |
+| M->   | right     | End ofthe buffer                 | /arrow right/           |
+|-------+-----------+----------------------------------+-------------------------|
+| C-M-a | left      | Begin of the balanced expression |                         |
+| C-M-e | right     | End of the balanced expression   |                         |
+|-------+-----------+----------------------------------+-------------------------|
+
+
+** Deleting and Pasting
+
+| Key   | Effect                              | Mnemonic       |
+|-------+-------------------------------------+----------------|
+| C-k   | Kill from the cursor to end of line | /kill/         |
+| C-d   | Delete the next character           | /delete/       |
+| M-d   | Delete the next word                | /delete/       |
+| M-del | Delete the previous word            |                |
+| C-del | Delete the next word                |                |
+|-------+-------------------------------------+----------------|
+| M-\   | Delete left spaces                  |                |
+| M-^   | Delete blank lines up               | /^/ = arrow up |
+|-------+-------------------------------------+----------------|
