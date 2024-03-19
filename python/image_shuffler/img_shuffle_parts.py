@@ -1,10 +1,10 @@
 #!python
 
 import sys
-import subprocess
 import itertools
+import glob
 import shlex
-import io
+import subprocess
 
 # Example of invocation: img_shuffle_parts.py src.png
 
@@ -15,23 +15,20 @@ if __name__ == '__main__':
                             stdout=subprocess.PIPE)
 
     how_many_segments = 0
-    dst_image_counter = 0
+    dst_image_counter = 1
 
-    args = shlex.split( 'ls segment-?.png' ) # argh! not working, lists everything!
-    print( args )
-    proc = subprocess.Popen([ 'ls',  'segment-?.png'],stdout=subprocess.PIPE, shell=True)
-    for line in io.TextIOWrapper(proc.stdout, encoding="utf-8"):
-        if line.startswith( 'segment' ):
-            how_many_segments += 1
+    files = glob.glob( "segment-?.png" )
+    print( files )
 
-    for p in list( itertools.permutations( range( 0, how_many_segments ) ) ):
-        to_merge = []
-        dst = 'dst-p' + str( dst_image_counter ) + '.png'
+    def all_permutations( x ):
+        for r in range( 1, len( x ) + 1 ):
+            yield from itertools.permutations( x, r )
+
+    combinations = list( map( ' '.join, all_permutations( files ) ) )
+    for to_merge in combinations:
+        dst = f'shuffled-%02d.png' % dst_image_counter
         dst_image_counter += 1
 
-        for i in p:
-            to_merge.append( 'segment-' + str( i ) + '.png' )
-
-        args = shlex.split( 'montage ' + ' '.join( to_merge ) + ' ' + dst )
+        args = shlex.split( 'montage ' + to_merge + ' ' + dst )
         merge = subprocess.run( args )
         print( "Created image " + dst )
