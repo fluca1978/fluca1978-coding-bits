@@ -14,18 +14,13 @@ if __name__ == '__main__':
     output = subprocess.run(['convert', src_file , '-crop', '250x250', '+repage', '+adjoin', 'segment-%d.png' ],
                             stdout=subprocess.PIPE)
 
-    how_many_segments = 0
+
     dst_image_counter = 1
 
     files = glob.glob( "segment-?.png" )
-    print( files )
-
-    def all_permutations( x ):
-        for r in range( 1, len( x ) + 1 ):
-            yield from itertools.permutations( x, r )
-
-    combinations = list( map( ' '.join, all_permutations( files ) ) )
+    combinations = list( map( ' '.join, itertools.permutations( files, len( files ) ) ) )
     for to_merge in combinations:
+
         dst = f'shuffled-%02d.png' % dst_image_counter
         dst_image_counter += 1
 
