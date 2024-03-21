@@ -5,32 +5,32 @@ import itertools
 import glob
 import shlex
 import subprocess
+from wand.image import Image
 
 # Example of invocation: img_pixelier.py src9.png
 
-if __name__ == '__main__':
+if __name__ == 'main':
     src_file = sys.argv[ 1 ]
 
-    output = subprocess.run(['convert', src_file , '-crop', '250x250', '+repage', '+adjoin', 'segment-%d.png' ],
-                            stdout=subprocess.PIPE)
+
+    src_image  = Image( filename = src_file )
+    src_width  = src_image.width
+    src_height = src_image.height
+
+    pieces      = 3
+    crop_width  = int( src_width / pieces )
+    crop_height = int( src_height / pieces )
+
+    dst_image = Image( width = src_width, height = src_height )
+    for r in range(0, pieces):
+        for c in range(0, pieces):
+            filename = f'segment-{r}{c}.png'
+            start_at_x = c * crop_width
+            start_at_y = r * crop_height
+            segment = Image( filename = src_file )
+            segment.crop( start_at_x, start_at_y, width = crop_width, height = crop_height )
+            if c != r or c != int( pieces / 2 ) or r != int( pieces / 2 ):
+                segment.blur( sigma = 20 )
 
 
-    dst_image_counter = 1
-
-    files = glob.glob( "segment-?.png" )
-    file = files.sort()
-    center_segment = int( len( files ) / 2  )
-    print( f'Center segment is {center_segment}' )
-
-    for segment in files:
-        if segment == f'segment-{center_segment}.png':
-            continue
-
-        print( f'Blurring {segment}' )
-        # convert -scale 10% -scale 1000% original.jpg pixelated.jpg
-        args = shlex.split( f'convert {segment} -blur 25x25 {segment}' )
-        subprocess.run( args )
-
-    args = shlex.split( 'montage '+ ' '.join( files ) + ' blurred.png' )
-    merge = subprocess.run( args )
-
+            dst_image.composite( image = segment, left = start_at_x, top = start_at_y )
