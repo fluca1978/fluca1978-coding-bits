@@ -1,0 +1,32 @@
+SQLActions[]={
+"BEGIN INSTALL
+BEGIN PostgreSQL
+CREATE OR REPLACE FUNCTION pwc262.task1_pljava(
+	nums integer[])
+	RETURNS integer
+	LANGUAGE java IMMUTABLE
+	RETURNS NULL ON NULL INPUT
+	AS e'int=PWC262.Task1.task1_pljava(int[])'
+END PostgreSQL;
+BEGIN PostgreSQL
+CREATE OR REPLACE FUNCTION pwc262.task2_pljava(
+	k integer,
+	nums integer[])
+	RETURNS integer
+	LANGUAGE java IMMUTABLE
+	RETURNS NULL ON NULL INPUT
+	AS e'int=PWC262.Task2.task2_pljava(int,int[])'
+END PostgreSQL;
+END INSTALL",
+"BEGIN REMOVE
+BEGIN PostgreSQL
+DROP FUNCTION pwc262.task1_pljava(
+	nums integer[])
+END PostgreSQL;
+BEGIN PostgreSQL
+DROP FUNCTION pwc262.task2_pljava(
+	k integer,
+	nums integer[])
+END PostgreSQL;
+END REMOVE"
+}
