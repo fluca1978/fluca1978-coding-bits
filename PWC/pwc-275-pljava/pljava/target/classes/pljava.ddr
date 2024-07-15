@@ -1,0 +1,32 @@
+SQLActions[]={
+"BEGIN INSTALL
+BEGIN PostgreSQL
+CREATE OR REPLACE FUNCTION pwc275.task1_pljava(
+	sentence pg_catalog.varchar,
+	keys pg_catalog.varchar[])
+	RETURNS integer
+	LANGUAGE java IMMUTABLE
+	RETURNS NULL ON NULL INPUT
+	AS e'int=PWC275.Task1.task1_pljava(java.lang.String,java.lang.String[])'
+END PostgreSQL;
+BEGIN PostgreSQL
+CREATE OR REPLACE FUNCTION pwc275.task2_pljava(
+	text pg_catalog.varchar)
+	RETURNS pg_catalog.varchar
+	LANGUAGE java IMMUTABLE
+	RETURNS NULL ON NULL INPUT
+	AS e'java.lang.String=PWC275.Task2.task2_pljava(java.lang.String)'
+END PostgreSQL;
+END INSTALL",
+"BEGIN REMOVE
+BEGIN PostgreSQL
+DROP FUNCTION pwc275.task1_pljava(
+	sentence pg_catalog.varchar,
+	keys pg_catalog.varchar[])
+END PostgreSQL;
+BEGIN PostgreSQL
+DROP FUNCTION pwc275.task2_pljava(
+	text pg_catalog.varchar)
+END PostgreSQL;
+END REMOVE"
+}
