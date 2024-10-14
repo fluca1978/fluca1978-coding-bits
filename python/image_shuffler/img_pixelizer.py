@@ -9,9 +9,8 @@ from wand.image import Image
 
 # Example of invocation: img_pixelier.py src9.png
 
-if __name__ == 'main':
+if __name__ == '__main__':
     src_file = sys.argv[ 1 ]
-
 
     src_image  = Image( filename = src_file )
     src_width  = src_image.width
@@ -24,7 +23,6 @@ if __name__ == 'main':
     dst_image = Image( width = src_width, height = src_height )
     for r in range(0, pieces):
         for c in range(0, pieces):
-            filename = f'segment-{r}{c}.png'
             start_at_x = c * crop_width
             start_at_y = r * crop_height
             segment = Image( filename = src_file )
@@ -32,5 +30,6 @@ if __name__ == 'main':
             if c != r or c != int( pieces / 2 ) or r != int( pieces / 2 ):
                 segment.blur( sigma = 20 )
 
-
             dst_image.composite( image = segment, left = start_at_x, top = start_at_y )
+
+    dst_image.save( filename = 'blurred.png' )
