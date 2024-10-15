@@ -17,7 +17,7 @@ sub MAIN( Str:D :$input,
 		       && $size > 1 && $size !%% 2
 		  && ( $force || ! $output.IO.e ) } = False ) {
 
-    my ( $src, $dst ) = MagickWand.new xx 2;
+    my $src = MagickWand.new;
     $src.read: $input;
 
     die Q｢Serve un'immagine "abbastanza" quadrata!｣ unless ( 0.9 < $src.width / $src.height < 1.1 );
@@ -30,16 +30,17 @@ sub MAIN( Str:D :$input,
 				col    => $_[ 0 ],
 				center => $_[ 1 ] == $center-x && $_[ 0 ] == $center-y,
 				image  => $src.clone ) } );
-    for @blocks  {
-	$_<image>.crop: $_<row> * $crop-x, $_<col> * $crop-y, $crop-x, $crop-y;
-	next if $_<center>;
-	$_<image>.blur( 0, 10 );
-    }
 
-    $dst = MagickWand.montage( @blocks.map( *<image> ),
-			       "{$size}x+0+0",
-			       "{$crop-x}x{$crop-y}+0+0",
-			       FrameMode, '0x0+0+0');
-    $dst.write( $output );
+    @blocks .= map( {
+	  $_<image>.crop: $_<row> * $crop-x, $_<col> * $crop-y, $crop-x, $crop-y;
+	  $_<image>.blur( 0, 10 ) unless $_<center>;
+	  $_<image>;
+        } );
+
+    MagickWand.montage( @blocks,
+			"{$size}x+0+0",
+			"{$crop-x}x{$crop-y}+0+0",
+			FrameMode, '0x0+0+0')
+    .write: $output;
 
 }
