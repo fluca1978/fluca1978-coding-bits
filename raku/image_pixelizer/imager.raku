@@ -2,7 +2,7 @@
 #
 # Example of invocation
 #
-# % raku imager.raku --input=src9.png --output=shuffled.png --force
+# % raku imager.raku --input=trinity.png --output=guess.png --force
 #
 #
 
