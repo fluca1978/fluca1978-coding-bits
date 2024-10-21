@@ -22,7 +22,7 @@ sub MAIN( Str :$input,
 
     die Q🐪Serve un'immagine "abbastanza" quadrata!🐪 unless ( 0.9 < $src.width / $src.height < 1.1 );
 
-    my ( $crop-x, $crop-y ) = ( ( $src.width, $src.height ) <</>> ( $size xx 2 ) ).map( *.Int );
+    my ( $crop-x, $crop-y ) = ( ( $src.width, $src.height ) <</>> $size ).map( *.Int );
 
     my @blocks = ( ( 0 ..^ $size ) X ( 0 ..^ $size ) )
 		     .map( { %( row    => $_[ 1 ],
