@@ -23,12 +23,11 @@ sub MAIN( Str:D :$input,
     die Q｢Serve un'immagine "abbastanza" quadrata!｣ unless ( 0.9 < $src.width / $src.height < 1.1 );
 
     my ( $crop-x, $crop-y ) = ( ( $src.width, $src.height ) <</>> ( $size xx 2 ) ).map( *.Int );
-    my ( $center-x, $center-y ) = ( $size / 2 ).Int xx 2;
 
     my @blocks = ( ( 0 ..^ $size ) X ( 0 ..^ $size ) )
 		     .map( { %( row    => $_[ 1 ],
 				col    => $_[ 0 ],
-				center => $_[ 1 ] == $center-x && $_[ 0 ] == $center-y,
+				center => $_[ 1 ] == $_[ 0 ] == ( $size / 2 ).Int,
 				image  => $src.clone ) } );
 
     @blocks .= map( {
