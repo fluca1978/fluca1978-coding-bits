@@ -2,16 +2,16 @@
 #
 # Example of invocation
 #
-# % raku imager.raku --input=src9.png --output=shuffled.png --force
+# % raku imager.raku --input=trinity.png --output=guess.png --force
 #
 #
 
 use MagickWand;
 use MagickWand::Enums;
 
-sub MAIN( Str :$input!,
-	  Str :$output!,
-	  Int :$size = 3,
+sub MAIN( Str  :$input!,
+	  Str  :$output!,
+	  Int  :$size = 3,
 	  Bool :$force?
 	       where { $input.IO.e
 		       && $size > 1 && $size !%% 2
