@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8"/>
+<title>Git</title>
+<meta name="author" content="Luca Ferrari"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+/* Keep every image inside the slide box. px values here are in deck space
+   (the .slides container is scaled by reveal.js), so they behave the same
+   on a laptop and on a projector. HTML width/height attributes are kept
+   for aspect ratio but clamped; object-fit avoids any distortion. */
+.reveal .slides img { max-width: 100%; max-height: 560px; object-fit: contain; }
+.reveal .slides img:not([width]):not([height]) { width: auto; height: auto; }
+.reveal .slides pre { font-size: 0.5em; }
+.reveal .slides section h2 { font-size: 1.5em; }
+.reveal .slides section h3 { font-size: 1.15em; }
+/* Keep the title slide compact so the title, author and date never
+   grow into the following slide's space. */
+.reveal .slides #sec-title-slide h1 { font-size: 2.4em; margin-bottom: 0.15em; }
+.reveal .slides #sec-title-slide h2 { font-size: 1.1em; margin: 0.1em 0; }
+.reveal .slides #sec-title-slide p.date { font-size: 0.7em; opacity: 0.7; }
+</style>
+<link rel="stylesheet" href="./reveal.js/dist/reveal.css"/>
+
+<link rel="stylesheet" href="./reveal.js/dist/theme/dracula.css" id="theme"/>
+
+<link rel="stylesheet" href="./reveal.js/plugin/zenburn.css"/></head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide"><h1 class="title">Git</h1><p class="subtitle"></p>
+<h2 class="author">Luca Ferrari</h2><h2 class="date">24 Ottobre 2026</h2><p class="date">Created: 2026-10-23 gio 12:17</p>
+</section>
+<section id="slide-agenda">
+<h2>Agenda (2 ore max)</h2>
+<ul>
+<li>Perché Git? (5 min)</li>
+<li>Concetti base (20 min)</li>
+<li>Demo pratica: init, add, commit (30 min)</li>
+<li>Branch e merge (30 min)</li>
+<li>Remoti: clone, pull, push (20 min)</li>
+<li>Correggere errori in sicurezza + Q&A (15 min)</li>
+</ul>
+</section>
+
+
+<section>
+<section id="slide-org048ad50">
+<h2 id="org048ad50">Who Am I?</h2>
+<p>
+<a href="https://fluca1978.github.io">https://fluca1978.github.io</a>
+</p>
+
+
+<div id="org30e359c" class="figure">
+<p><img src="./images/fluca1978.png" alt="fluca1978.png" align="left" height="600px" />
+</p>
+</div>
+
+
+
+<div id="orgaafd80a" class="figure">
+<p><img src="./images/hachiko.png" alt="hachiko.png" align="right" height="600px" />
+</p>
+</div>
+
+
+
+
+
+</section>
+</section>
+<section>
+<section id="slide-org22c1420">
+<h2 id="org22c1420">PostgreSQL, Perl, ecc.</h2>
+
+<div id="org0a8be1c" class="figure">
+<p><img src="./images/pg11ssp.png" alt="pg11ssp.png" align="left" height="400px" />
+</p>
+</div>
+
+
+<div id="org4a4aeed" class="figure">
+<p><img src="./images/learn_postgresql_2nd.jpeg" alt="learn_postgresql_2nd.jpeg" align="right" height="400px" />
+</p>
+</div>
+
+
+<ul>
+<li>Consulenze e corsi professionali su <b>PostgreSQL</b> e <b>Perl</b></li>
+<li>GSoC 2024, 2025 (PostgreSQL - pgagroal) mento</li>
+
+</ul>
+
+
+
+
+
+
+
+
+</section>
+</section>
+<section>
+<section id="slide-org65641c2">
+<h2 id="org65641c2">Questo talk</h2>
+<p class="r-fit-text">
+Git per non impazzire con 20 versioni di <code>presentazione_finale.pdf</code>
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org5b2dee3">
+<h3 id="org5b2dee3">Signorina Silvani style &#x2026;</h3>
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% tree Documents --sort=ctime
+
+ Documents/
+  +-- presentazione_git.pdf
+  +-- presentazione_git_v2.pdf
+  +-- presentazione_git_v2_con_immagini.pdf
+  +-- presentazione_git_v3.pdf
+  +-- presentazione_git_finale.pdf
+  +-- presentazione_git_finale_16Ottobre.pdf
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgd414f41">
+<h3 id="orgd414f41">&#x2026; meglio di no!</h3>
+
+<div id="orga5037de" class="figure">
+<p><img src="./images/fantozzi.jpg" alt="fantozzi.jpg" width="150%" />
+</p>
+</div>
+
+
+</section>
+</section>
+<section>
+<section id="slide-org8870207">
+<h2 id="org8870207">VCS, DVCS &#x2026; oh my!</h2>
+<p>
+Un <i>VCS</i> (Version Control System) è uno strumento per il <span class="underline">controllo delle revisioni</span>.
+</p>
+
+<p>
+Un <i>DVCS</i> (Distributed Version Control System) è uno strumento per il controllo delle revisioni <span class="underline">distribuito</span>.
+</p>
+
+
+<p class="r-fit-text">
+<b>distribuito</b> significa che non esiste una copia più importante di un'altra!
+</p>
+
+
+
+</section>
+<section id="slide-org79e905c">
+<h3 id="org79e905c">Git</h3>
+<p>
+Git viene creato da Linus Torvalds per risolvere gli attriti fra gli sviluppatori kernel causati dalla perdita dell'uso di BitKeeper.
+</p>
+
+<p>
+Inizialmente, e ancora oggi, Git è pensato per lavorare con le email.
+</p>
+
+<p>
+Junio C. Hamano implementò i comandi user-friendly di <code>git</code>.
+</p>
+
+
+<div id="org8567439" class="figure">
+<p><img src="./images/junio.jpeg" alt="junio.jpeg" />
+</p>
+</div>
+
+
+
+
+</section>
+<section id="slide-orgdf130a8">
+<h3 id="orgdf130a8">Git mentality</h3>
+<p>
+Git è stato pensato per <span class="underline">un caso d'uso specifico</span>: un progetto di grosse dimensioni con molti file e molti partecipanti!
+</p>
+
+<p>
+Spesso è troppo potente per i nostri progetti!
+</p>
+
+
+<div id="org083c0a3" class="figure">
+<p><img src="./images/rocket.jpg" alt="rocket.jpg" width="70%" />
+</p>
+</div>
+
+</section>
+<section id="slide-orgbbcd735">
+<h3 id="orgbbcd735">Git mentality (2)</h3>
+<p>
+Git tiene sotto controllo un intero albero (tree) di file e directory: <i>non considera affatto le modifiche ai singoli file!</i>
+</p>
+
+
+<div class="org-center">
+<p align="center" class="r-fit-text">
+<i><b>Git è fatto per dimenticare!</b></i>
+</p>
+</div>
+
+
+
+</section>
+<section id="slide-org0592110">
+<h3 id="org0592110">Git is simple</h3>
+<p>
+&#x2026; kind of!
+</p>
+
+
+<div id="org367b9fa" class="figure">
+<p><img src="./images/cube.jpg" alt="cube.jpg" width="50%" />
+</p>
+</div>
+
+
+
+</section>
+<section id="slide-orgdd3d918">
+<h3 id="orgdd3d918">Non solo git!</h3>
+<p>
+<code>git</code> è un DVCS molto famoso e ampiamente adottato, ma non è il solo:
+</p>
+
+<ul>
+<li><b>fossil</b> <a href="https://www2.fossil-scm.org">https://www2.fossil-scm.org</a></li>
+<li><b>got</b> <a href="https://gameoftrees.org/">https://gameoftrees.org/</a></li>
+<li><b>hg</b> (Mercurial SCM) <a href="https://www.mercurial-scm.org">https://www.mercurial-scm.org</a></li>
+<li><code>bzr</code> (GNU Bazar)</li>
+<li>BitKeeper</li>
+
+</ul>
+
+<p>
+<a href="https://en.wikipedia.org/wiki/Comparison_of_version-control_software">https://en.wikipedia.org/wiki/Comparison_of_version-control_software</a>
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org17305e5">
+<h2 id="org17305e5">Terminologia di base</h2>
+<ul>
+<li><b>repository</b> è il contenitore dei nostri dati (<i>working tree</i> + <code>.git</code>);
+<ul>
+<li><i>index</i> è spesso causa di mal di testa!</li>
+<li><code>HEAD</code> è lo stato attuale del repository;</li>
+<li><b>check-out</b> è una versione del repository;</li>
+
+</ul></li>
+<li><b>commit</b> (detto anche <i>check-in</i>) è una singola modifica allo stato del repository;</li>
+<li><b>branch</b> è una diramazione del nostro progetto;</li>
+<li><b>merge</b> è l'unione di più modifiche avvenute in parallelo;</li>
+<li><code>tag</code> è una etichetta applicata ad un preciso punto della storia del progetto (commit);</li>
+<li><code>remote</code> è un riferimento ad una copia differente del repository;</li>
+
+</ul>
+
+
+
+</section>
+</section>
+
+<section>
+<section id="slide-org4daa6d2">
+<h2 id="org4daa6d2">Working tree, Index, HEAD</h2>
+<p>
+In ogni momento, ci sono tre stati possibili:
+</p>
+
+<ul>
+<li><b>working tree</b> ti dice dove sei;</li>
+<li><b><code>HEAD</code></b> ti dice dov'eri;</li>
+<li><b><i>index</i></b> ti dice dove stai andando.</li>
+
+</ul>
+
+
+<div id="org188a1ab" class="figure">
+<p><img src="./images/back_to_the_future_panel.jpg" alt="back_to_the_future_panel.jpg" />
+</p>
+</div>
+
+</section>
+<section id="slide-org91c8c3a">
+<h3 id="org91c8c3a">Identificare uno stato</h3>
+<p>
+Ogni stato del repository viene identificato da un <b>hash</b> (<code>SHA-1</code>); l'hash identifica la <i>revisione</i> alla quale si sta facendo riferimento.
+</p>
+
+<p>
+L'hash identifica in maniera univoca (<i>senza collisioni</i>) lo stato di un repository <span class="underline">ovunque si trovi</span>:
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >e14c994fb0d1bd650a5b960c27ecbf5aef1d4959
+</code></pre>
+</div>
+
+<p>
+Gli hash possono essere "accorciati" al loro prefisso univoco:
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >e14c994fb0d1bd650a5b960c27ecbf5aef1d4959
+e14c994
+</code></pre>
+</div>
+
+
+
+</section>
+<section id="slide-org74f627d">
+<h3 id="org74f627d">Branch</h3>
+<p>
+Un <b>branch</b> (ramo) è <b>la linea temporale</b> che identifica lo stato del repository.
+</p>
+
+
+
+<div id="orgc3d5e51" class="figure">
+<p><img src="./images/back_to_the_future.jpg" alt="back_to_the_future.jpg" align="center" height="400px" />
+</p>
+</div>
+
+
+<p>
+I branch sono privati (eccetto quando diventano pubblici!).
+</p>
+
+<p>
+I branch possono essere fatti confluire uno nell'altro (<i>merging</i>).
+</p>
+
+
+</section>
+<section id="slide-org2cc880c">
+<h3 id="org2cc880c">Branch principale: <code>main</code></h3>
+<p>Oggi il branch iniziale si chiama <b><code>main</code></b> (in passato <code>master</code>).</p>
+</section>
+<section id="slide-org3e99ddb">
+<h3 id="org3e99ddb">Merge</h3>
+<p>
+Un <code>merge</code> è <b>un commit che ha uno o più <i>parent</i></b>, ossia che deriva da commit precedenti.
+</p>
+
+<p>
+La capacità di creare un <code>merge</code> (un singolo commit) da più di due commit viene denominata <i>octupus merge</i>.
+</p>
+
+
+<div id="org61d9435" class="figure">
+<p><img src="./images/github.png" alt="github.png" align="right" height="200px" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org88440e9">
+<h2 id="org88440e9">Demo</h2>
+<p>
+Un semplice esempio
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org167cd83">
+<h2 id="org167cd83">Inizializzazione di un repository</h2>
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% mkdir linux_day
+% cd linux_day
+
+% git init .
+Initialized empty Git repository in /home/luca/tmp/linux_day/.git/
+</code></pre>
+</div>
+
+<p>
+e opzionalmente
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git config --local user.name "Luca Ferrari"
+% git config --local user.email "fluca1978@gmail.com"
+</code></pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org8ea9405">
+<h2 id="org8ea9405">Creare un contenuto</h2>
+<p>
+Si aggiunge un file
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% cat &lt;&lt; EOF &gt; main.py
+print( "Hello world!" )
+EOF
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgb2ad78a">
+<h3 id="orgb2ad78a">Il primo commit</h3>
+<p>
+<code>git status</code> ci indica cosa sta succedendo:
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git status
+On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+	main.py
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+</code></pre>
+</div>
+
+<p>
+<b><code>git add</code></b> e <b><code>git commit</code></b> consolidano la situazione:
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git add main.py
+
+% git commit -m "Commit iniziale"
+[main (root-commit) dc14a5e] Commit iniziale
+ 1 file changed, 1 insertion(+)
+ create mode 100644 main.py
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgbf65816">
+<h3 id="orgbf65816">Aggiungere altri contenuti</h3>
+<p>
+<code>git add</code> e <code>git commit</code> per le varie modifiche:
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% $EDITOR main.py
+% git add main.py
+% git commit -m "Linux Day 2026"
+...
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org495ee00">
+<h3 id="org495ee00">Dove siamo?</h3>
+<p>
+<b><code>git log</code></b> permette di percorrere la storia fino a qui:
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git log --oneline
+
+cbe5b0e (HEAD -&gt; main) She-bang
+31a08fc Linux Day 2026
+dc14a5e Commit iniziale
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org9c6097e">
+<h3 id="org9c6097e">Ritrovare la bussola!</h3>
+<p>
+<code>git diff</code> consente di vedere le differenze fra diversi stati. In default controlla la differenza fra index e working tree, se si
+specifica un commit si vede la differenza fra lo stato attuale e quello precedente:
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git diff dc14a5e
+
+diff --git a/main.py b/main.py
+index c61fd26..35d4899 100644
+--- a/main.py
++++ b/main.py
+@@ -1 +1,2 @@
+-print( "Hello world!" )
++#!python3
++print( "Hello Linux Day 2026" )
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgc6f045c">
+<h3 id="orgc6f045c">Maledetti hash!</h3>
+<p>
+Se non si vuole lavorare con gli hash, si può usare <code>HEAD</code> come punto di partenza e specificare di quante revisioni andare indietro nel tempo:
+</p>
+<ul>
+<li><b>~</b> seguita da un numero;</li>
+<li><b><code>^</code></b>, uno per ogni salto.</li>
+
+</ul>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git diff HEAD~2
+
+% git diff HEAD^^
+</code></pre>
+</div>
+
+
+
+</section>
+</section>
+<section>
+<section id="slide-org22b21f5">
+<h2 id="org22b21f5">Branch, modifiche, conflitti</h2>
+<p>
+Il comando <code>git branch</code> consente di gestire i rami.
+</p>
+
+<p>
+Ogni <i>branch</i> vive di vita propria, i commit sono consolidati su quel ramo senza "sporcare" gli altri rami.
+</p>
+
+<div class="org-center">
+<p>
+<b>Ogni repository di fatto è <i>almeno</i> un ramo</b>!
+</p>
+</div>
+
+<p>
+Lo sviluppo con più rami in parallelo genera <b>conflitti</b>.
+</p>
+
+
+</section>
+<section id="slide-orge1686f7">
+<h3 id="orge1686f7">Creare un ramo e apportare modifiche</h3>
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git branch add_exit
+
+% git checkout add_exit
+Switched to branch 'add_exit'
+
+% $EDITOR main.py
+% git add main.py
+% git commit -m "Aggiunta sys.exit()"
+[add_exit cc84ff2] Aggiunta sys.exit()
+ 1 file changed, 2 insertions(+)
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgb700057">
+<h3 id="orgb700057">Creare un altro ramo e apportare altre modifiche</h3>
+<p>
+Il nuovo ramo parte da dove si è in quel momento, se si vuole specificare l'origine occorre fare prima un <code>checkout</code> o indicare al comando <code>branch</code> il <i>parent</i>.
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git branch add_year main
+
+% git checkout add_year
+Switched to branch 'add_year'
+
+% $EDITOR main.py
+
+% git add main.py
+% git commit -m "Anno come parametro"
+[add_year de42861] Anno come parametro
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+</code></pre>
+</div>
+
+
+</section>
+<section id="slide-orgdd09ba1">
+<h3 id="orgdd09ba1">Nel frattempo su <code>main</code></h3>
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git checkout main
+% $EDITOR main.py
+% git add main.py
+% git commit -m "Aggiunta documentazione"
+[main bb3f4b3] Aggiunta documentazione
+ 1 file changed, 2 insertions(+)
+</code></pre>
+</div>
+
+
+
+</section>
+<section id="slide-orgbe102ae">
+<h3 id="orgbe102ae">Merge</h3>
+<p>
+Riunionamo tutto quanto sul ramo <code>main</code>:
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git checkout main
+
+% git merge add_exit
+Auto-merging main.py
+CONFLICT (content): Merge conflict in main.py
+Automatic merge failed; fix conflicts and then commit the result.
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgb6cda5d">
+<h3 id="orgb6cda5d">Conflitti</h3>
+
+<div id="org99f6f0f" class="figure">
+<p><img src="./images/train_crash.jpg" alt="train_crash.jpg" />
+</p>
+</div>
+
+
+</section>
+<section id="slide-orgcdb14ea">
+<h3 id="orgcdb14ea">Risolvere i conflitti</h3>
+<p>
+Occorre editare il file manualmente e capire cosa c'è che non va.
+</p>
+
+
+<div id="orge4b479d" class="figure">
+<p><img src="./images/merge_conflict_1.png" alt="merge_conflict_1.png" width="40%" />
+</p>
+</div>
+
+<p>
+e una volta fatto
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >
+% git merge --continue
+[main fb9006c] Merge branch 'add_exit'
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org401b5b8">
+<h3 id="org401b5b8">Risultato</h3>
+
+<div id="orgd6db1c4" class="figure">
+<p><img src="./images/git_branch_1.png" alt="git_branch_1.png" width="100%" />
+</p>
+</div>
+
+
+
+</section>
+</section>
+<section>
+<section id="slide-org1f2bb01">
+<h2 id="org1f2bb01">Trovare e correggere gli errori</h2>
+<ul>
+<li><b><code>git log</code> / <code>git diff</code></b> - capire cosa è cambiato</li>
+<li><b><code>git revert &lt;hash&gt;</code></b> - annulla in sicurezza (ideale se già pubblicato)</li>
+<li><b><code>git bisect</code></b> - per grandi storie, trova il commit colpevole (mostriamo concettualmente)</li>
+</ul>
+<p><small>Consiglio pratico: preferisci <code>git revert</code> rispetto a riscrivere la storia sui rami pubblici.</small></p>
+</section>
+<section id="slide-org0cd4db6">
+<h3 id="org0cd4db6">Esempio: <code>git revert</code></h3>
+<div class="org-src-container">
+<pre   ><code class="shell" >% git revert HEAD
+[main 5f5010d] Revert "print di debug all'avvio"
+ 1 file changed, 1 deletion(-)
+</code></pre>
+</div>
+<p>Viene creato un nuovo commit che annulla le modifiche.</p>
+</section>
+<section id="slide-org250b814">
+<h3 id="org250b814">Pulire i rami</h3>
+<p>
+Una volta <i>integrati</i> i branch possono essere eliminati e l'informazione sui relativi commit non andrà persa (o quasi?).
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git branch -D add_year
+Deleted branch add_year (was 187cceb).
+% git branch -D add_exit
+Deleted branch add_exit (was 822dce1).
+
+% git log --oneline
+99e28a1 (HEAD -&gt; main) Risolve problema exit, fix 822dce1d
+8ab3b4b Merge branch 'add_year'
+fb9006c Merge branch 'add_exit'
+6514042 Aggiunta documentazione
+187cceb Anno come parametro
+822dce1 Aggiunta sys.exit()
+b64797b She bang
+9f26b25 Linux Day 2026
+345e5ab Commit iniziale
+</code></pre>
+</div>
+
+<p>
+<b>Si perde l'informazione circa il nome dei branch nei commit!</b>
+</p>
+
+
+
+</section>
+</section>
+<section>
+<section id="slide-org70e3d9a">
+<h2 id="org70e3d9a">Rebase: solo per sapere che esiste</h2>
+<ul>
+<li><code>git rebase</code> riscrive la storia (sposta commit)</li>
+<li>Utile per tenere lineare la storia locale</li>
+<li><b>Da evitare</b> sui branch già pubblicati</li>
+<li>Per il laboratorio odierno ci basta sapere quando NON usarlo</li>
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org34c85a3">
+<h2 id="org34c85a3">Prepararsi a pubblicare: <code>git remote</code></h2>
+<p>
+Occorre creare un repository (vuoto) su un qualche fornitore.
+Dopodiché si configura <code>git</code> per interagire con quel sistema <i>remoto</i>.
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git remote add gitlab git@gitlab.com:fluca1978/ld2026.git
+
+% git remote -v show
+gitlab  git@gitlab.com:fluca1978/ld2026.git (fetch)
+gitlab  git@gitlab.com:fluca1978/ld2026.git (push)
+
+  # opzionale
+% git config --local push.autoSetupRemote true
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org349dcbb">
+<h3 id="org349dcbb">Pubblicare: <code>git push</code></h3>
+<p>
+<b>Da qui in avanti, si è espsoti al pubblico imbarazzo!</b>
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git push gitlab
+Enumerating objects: 19, done.
+Counting objects: 100% (19/19), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (12/12), done.
+Writing objects: 100% (19/19), 1.73 KiB | 1.73 MiB/s, done.
+Total 19 (delta 3), reused 0 (delta 0), pack-reused 0
+To gitlab.com:fluca1978/ld2026.git
+ * [new branch]      main -&gt; main
+branch 'main' set up to track 'gitlab/main'.
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orga30fed3">
+<h3 id="orga30fed3">Accedere ai dati da un'altra istanza: <code>git clone</code></h3>
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git clone git@gitlab.com:fluca1978/ld2026.git
+Cloning into 'ld2026'...
+remote: Enumerating objects: 19, done.
+remote: Counting objects: 100% (19/19), done.
+remote: Compressing objects: 100% (12/12), done.
+remote: Total 19 (delta 3), reused 0 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (19/19), done.
+Resolving deltas: 100% (3/3), done.
+
+% cd ld2026
+
+% git log --oneline
+5f5010d (HEAD -&gt; main, origin/main, origin/HEAD) Revert "print di debug all'avvio"
+bc0c4be print di debug all'avvio
+2f365f9 Risolve anno corrente con datetime
+...
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orge2cc6a7">
+<h3 id="orge2cc6a7">Prelevare le modifiche degli altri: <code>git pull</code></h3>
+<p>
+Si supponga che sia stata pubblicata un'altra modifica.
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git pull
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+Unpacking objects: 100% (3/3), 336 bytes | 336.00 KiB/s, done.
+From gitlab.com:fluca1978/ld2026
+   5f5010d..abff201  main       -&gt; gitlab/main
+Updating 5f5010d..abff201
+Fast-forward
+ main.py | 2 ++
+ 1 file changed, 2 insertions(+)
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgeb3be49">
+<h3 id="orgeb3be49">Cosa è successo?</h3>
+<div class="org-src-container">
+
+<pre   ><code class="shell" >% git log --format="%h %an %s"
+abff201 Diego Documentazione
+bc0c4be Luca Ferrari print di debug all'avvio
+2f365f9 Luca Ferrari Risolve anno corrente con datetime
+99e28a1 Luca Ferrari Risolve problema exit, fix 822dce1d
+8ab3b4b Luca Ferrari Merge branch 'add_year'
+fb9006c Luca Ferrari Merge branch 'add_exit'
+6514042 Luca Ferrari Aggiunta documentazione
+187cceb Luca Ferrari Anno come parametro
+822dce1 Luca Ferrari Aggiunta sys.exit()
+b64797b Luca Ferrari She bang
+9f26b25 Luca Ferrari Linux Day 2026
+345e5ab Luca Ferrari Commit iniziale
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org6163422">
+<h3 id="org6163422">Pull, Fetch, Rebase</h3>
+<p>
+Il comando <code>git pull</code> corrisponde a <b><code>git fetch</code></b> e <b><code>git merge</code></b>.
+</p>
+
+<p>
+Il comando <code>git fetch</code> preleva le modifiche e non le applica (es. per ispezione e successiva integrazione).
+</p>
+
+<p>
+Il comando <code>git rebase</code> permette di applicare le modifiche di un ramo remoto: <b><code>git fetch</code></b> e <b><code>git rebase</code></b> importano nel proprio ramo le modifiche remote.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-orgeb49bc4">
+<h2 id="orgeb49bc4">Conclusioni</h2>
+<p>
+Git è uno strumento molto potente che consente un controllo raffinato delle versioni di un work-tree.
+</p>
+</section>
+</section>
+</div>
+</div>
+<script src="./reveal.js/dist/reveal.js"></script>
+<script src="./reveal.js/plugin/highlight.js"></script>
+
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+plugins: [RevealHighlight],
+width:1200, height:800,
+slideNumber: true,
+transition: "fade"
+});
+
+</script>
+</body>
+</html>
